@@ -1,0 +1,1 @@
+var tasks = [{"name": "1 Prize Task", "images": ["random_image.jpg"], "videos": ["flight.mp4"]}, {"name": "2 Task 1", "images": [], "videos": []}, {"name": "3 Team Task", "images": [], "videos": []}, {"name": "4 Task 2", "images": [], "videos": []}, {"name": "5 Studio Task", "images": [], "videos": []}]

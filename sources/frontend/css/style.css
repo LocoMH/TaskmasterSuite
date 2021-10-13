@@ -1,0 +1,166 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+}
+
+#div-scoreboard {
+  background-image: url("../../../data/backgrounds/Typewriter.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+#div-scoreboard-2 {
+  left: 0;
+  top: 0;
+}
+
+.div-containers {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#inner-scoreboard {
+  height: 413px;
+
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  -ms-transform-origin: left;
+  transform-origin: left;
+
+  overflow: visible;
+}
+
+.contestant {
+  width: 205px;
+
+  margin: 0 auto;
+  position: absolute;
+
+  transition: transform 2s;
+}
+
+.contestant img {
+  width: 100%;
+}
+
+.score-container,
+.frame-container {
+  position: relative;
+}
+
+.frame-scaler {
+  transition: transform 2s;
+
+  -ms-transform-origin: bottom;
+  transform-origin: bottom;
+}
+
+.larger {
+  -ms-transform: scale(1.2);
+  transform: scale(1.2);
+}
+
+.large {
+  -ms-transform: scale(1.1);
+  transform: scale(1.1);
+}
+
+.frame-container {
+  filter: drop-shadow(15px 15px 3px rgba(0, 0, 0, 0.4));
+
+  margin-bottom: 25px;
+  height: 250px;
+
+  -ms-transform-origin: center;
+  transform-origin: center;
+
+  -webkit-animation: rotate 3s ease-in-out alternate infinite;
+  animation: rotate 3s ease-in-out alternate infinite;
+
+  cursor: pointer;
+}
+
+.frame {
+  transform: translateZ(0);
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(-4deg);
+  }
+
+  100% {
+    transform: rotate(4deg);
+  }
+}
+
+.frame-container img {
+  position: absolute;
+}
+
+.fill {
+  top: 33px;
+  right: 33px;
+  bottom: 33px;
+  left: 33px;
+
+  position: absolute;
+
+  background-color: white;
+  background-position: center;
+  background-size: cover;
+
+  overflow: hidden;
+}
+
+.shadow {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  box-shadow: inset -5px 5px 7px rgba(0, 0, 0, 0.5);
+}
+
+.score {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+
+  line-height: 180px;
+
+  text-align: center;
+  vertical-align: middle;
+
+  margin: 0;
+  padding: 0;
+  margin-left: 8px;
+
+  color: white;
+  font-family: "veteran_typewriterregular", sans-serif;
+
+  font-size: 84px;
+
+  font-weight: normal;
+  font-style: normal;
+
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
