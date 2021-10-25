@@ -1,31 +1,6 @@
-import time
 import os
-import json
 import helper
 import db
-
-
-def load_data():
-    with open(helper.find_root() + "/sources/db/data.json", "r") as json_file:
-        data = json.load(json_file)
-        return data
-
-
-def write_data(data):
-    with open(helper.find_root() + "/sources/db/data.json", "w") as outfile:
-        json.dump(data, outfile)
-
-
-data = load_data()
-if "contestants" not in data:
-    data["contestants"] = []
-    write_data(data)
-if "tasks" not in data:
-    data["tasks"] = []
-    write_data(data)
-if "special_images" not in data:
-    data["special_images"] = []
-    write_data(data)
 
 
 def check_for_contestants(root: str):
