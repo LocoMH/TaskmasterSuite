@@ -67,7 +67,7 @@ function setup() {
 
     special_images.forEach(img => {
         if (img.name.toLowerCase() != "taskmaster") {
-            $("#div-basic-controls").append(" ").append('<button class="btn btn-primary special-button" onclick="showImage(event)" data-root="./data/' + img.filename + '">Show ' + img.name + '</button>')
+            $("#div-basic-controls").append(" ").append('<button class="btn btn-primary special-button" onclick="showImage(event)" data-root="./data/' + img.img_source + '">Show ' + img.name + '</button>')
         }
     })
 

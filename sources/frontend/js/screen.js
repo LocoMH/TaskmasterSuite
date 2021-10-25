@@ -213,13 +213,12 @@
         xhttp.send()
     }
     
-    getSpecialImages()
     getContestants()
-
+    getSpecialImages()
 
     document.querySelector("#image-taskmaster").src = "./data/" + special_images.find(img => {
         return img.name.toLowerCase() == "taskmaster"
-    }).filename
+    }).img_source
 
     function showDiv(name) {
         document.querySelector("#div-" + name).style.display = "block"
@@ -284,8 +283,6 @@
 
         divTaskmaster.style.transform = "scale(" + m2 + ")"
         divTaskmaster.style.msTransform = "scale(" + m2 + ")"
-
-		// divScoreboard2.style.left = (w - wm * m) / 2 + "px"
 	}
 
 	window.addEventListener("resize", resize)
