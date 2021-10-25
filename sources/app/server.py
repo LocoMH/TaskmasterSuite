@@ -1,7 +1,7 @@
 import threading
 import logging
 from typing import List
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.websockets import WebSocketDisconnect
 import uvicorn
@@ -9,6 +9,7 @@ import multiprocessing
 from loader import generate_files
 import ctypes
 import helper
+import db
 
 app = FastAPI()
 
@@ -34,14 +35,36 @@ manager = ConnectionManager()
 app.mount("/home/", StaticFiles(directory=helper.find_root()), name="static")
 
 
+@app.get("/data/contestants")
+async def get_contestants():
+    return db.get_contestants()
+
+
+@app.get("/data/tasks")
+async def get_tasks():
+    return db.get_tasks()
+
+
+@app.get("/data/special_images")
+async def get_special_images():
+    return db.get_special_images()
+
+
+@app.delete("/data/scores")
+async def delete_scores():
+    db.clear_scores()
+    return Response(status_code=204)
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            if data.split("+++")[0] == "":
-                pass
+            data_list = data.split("+++")
+            if data_list[0] == "setScore":
+                db.add_score(data_list[1], data_list[2], data_list[3])
 
             await manager.broadcast(data)
     except WebSocketDisconnect:

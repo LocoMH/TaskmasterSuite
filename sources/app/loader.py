@@ -1,45 +1,58 @@
+import time
 import os
 import json
 import helper
-
-all_files = {
-    "contestants": [],
-    "tasks": [],
-    "special_images": [],
-    "ip_address": ""
-}
+import db
 
 
-def generate_file(root, data, filename):
-    print("found changes in " + filename +
-          ", generating " + filename + ".js...")
-    output = "var " + filename + " = " + json.dumps(data)
-    all_files[filename] = data
-    f = open(root + "/sources/frontend/js/" + filename + ".js", "w")
-    f.write(output)
-    f.close()
+def load_data():
+    with open(helper.find_root() + "/sources/db/data.json", "r") as json_file:
+        data = json.load(json_file)
+        return data
 
 
-def generate_contestants(root: str):
+def write_data(data):
+    with open(helper.find_root() + "/sources/db/data.json", "w") as outfile:
+        json.dump(data, outfile)
+
+
+data = load_data()
+if "contestants" not in data:
+    data["contestants"] = []
+    write_data(data)
+if "tasks" not in data:
+    data["tasks"] = []
+    write_data(data)
+if "special_images" not in data:
+    data["special_images"] = []
+    write_data(data)
+
+
+def check_for_contestants(root: str):
     files = [f for f in os.listdir(
         root + "/data/contestants") if f.endswith((".jpg", ".png", ".jpeg"))]
 
-    contestants = [{
+    newContestants = [{
         "name": file.rsplit(".", 1)[0],
-        "filename": file,
-        "newScore": 0,
-        "score": 0
+        "img_source": file
     } for file in files]
 
-    if all_files["contestants"] != contestants:
-        generate_file(root, contestants, "contestants")
+    oldContestants = db.get_raw_contestants()
+
+    for contestant in newContestants:
+        if not any(contestant["name"] == oldContestant["name"] for oldContestant in oldContestants):
+            db.add_contestant(contestant["name"], contestant["img_source"])
+
+    for contestant in oldContestants:
+        if not any(contestant["name"] == newContestant["name"] for newContestant in newContestants):
+            db.remove_contestant(contestant["name"])
 
 
-def generate_tasks(root: str):
+def check_for_tasks(root: str):
     files = [f.rsplit(".", 1)[0] for f in os.listdir(
         root + "/data/tasks")]
 
-    tasks = [{
+    newTasks = [{
         "name": task,
         "images": [
             img for img in os.listdir(root + "/data/tasks/" + task) if img.endswith((".png", ".jpg", ".jpeg"))
@@ -49,28 +62,39 @@ def generate_tasks(root: str):
         ]
     } for task in files]
 
-    if all_files["tasks"] != tasks:
-        generate_file(root, tasks, "tasks")
+    oldTasks = db.get_raw_tasks()
+
+    for task in newTasks:
+        if not any(task["name"] == oldTask["name"] for oldTask in oldTasks):
+            db.add_task(task["name"], task["images"], task["videos"])
+
+    for task in oldTasks:
+        if not any(task["name"] == newTask["name"] for newTask in newTasks):
+            db.remove_task(task["name"])
+
+    for task in newTasks:
+        db.update_task(task["name"], task["images"], task["videos"])
 
 
-def generate_special_images(root: str):
+def check_for_special_images(root: str):
     files = [f for f in os.listdir(
         root + "/data") if f.endswith((".jpg", ".png", ".jpeg"))]
 
-    special_images = [{
+    newSpecialImages = [{
         "name": img.rsplit(".", 1)[0].capitalize(),
-        "filename": img
+        "img_source": img
     } for img in files]
 
-    if all_files["special_images"] != special_images:
-        generate_file(root, special_images, "special_images")
+    oldSpecialImages = db.get_special_images()
 
+    for special_image in newSpecialImages:
+        if not any(special_image["name"] == oldSpecialImage["name"] for oldSpecialImage in oldSpecialImages):
+            db.add_special_image(
+                special_image["name"], special_image["img_source"])
 
-def generate_ip_address(root: str):
-    ip_address = helper.get_ip()
-
-    if ip_address != all_files["ip_address"]:
-        generate_file(root, ip_address, "ip_address")
+    for special_image in oldSpecialImages:
+        if not any(special_image["name"] == newSpecialImage["name"] for newSpecialImage in newSpecialImages):
+            db.remove_special_image(special_image["name"])
 
 
 def generate_files():
@@ -78,10 +102,9 @@ def generate_files():
     if root is None:
         print("error - could not find root directory which includes 'data' directory!")
     else:
-        generate_contestants(root)
-        generate_tasks(root)
-        generate_special_images(root)
-        generate_ip_address(root)
+        check_for_contestants(root)
+        check_for_tasks(root)
+        check_for_special_images(root)
 
 
 if __name__ == "__main__":

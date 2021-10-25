@@ -1,13 +1,60 @@
 
-var ws = new WebSocket("ws://" + ip_address + ":8001/ws")
+
+
+var ws = new WebSocket("ws://" + window.location.host + "/ws")
 // $('.custom-switch').bootstrapSwitch()
 
 var scores = []
+var contestants = []
+var tasks = []
 
-
-function getTaskRow() {
-
+function getTasks() {
+    var xhttp = new XMLHttpRequest()
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            tasks = JSON.parse(this.responseText)
+            tasks.sort((a, b) => a.name.localeCompare(b.name))
+        }
+    }
+    xhttp.open("GET", "/data/tasks", false)
+    xhttp.send()
 }
+
+function getContestants() {
+    var xhttp = new XMLHttpRequest()
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            contestants = JSON.parse(this.responseText)
+            contestants.sort((a, b) => a.name.localeCompare(b.name))
+        }
+    }
+    xhttp.open("GET", "/data/contestants", false)
+    xhttp.send()
+}
+
+function getSpecialImages() {
+    var xhttp = new XMLHttpRequest()
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            special_images = JSON.parse(this.responseText)
+        }
+    }
+    xhttp.open("GET", "/data/special_images", false)
+    xhttp.send()
+}
+
+function resetScores() {
+    var xhttp = new XMLHttpRequest()
+    xhttp.onreadystatechange = function() {
+        window.location.reload(true)
+    }
+    xhttp.open("DELETE", "/data/scores", false)
+    xhttp.send()
+}
+
+getSpecialImages()
+getTasks()
+getContestants()
 
 function selectTask(id) {
     $("#selected-task").text("Selected Task: " + tasks[id - 1].name)
@@ -38,44 +85,41 @@ function setup() {
     })
 
 
-    var iTask = 1
     tasks.forEach(task => {
         var taskRow = $("<tr/>")
         taskTableBody.append(taskRow)
-        taskRow.append("<th scope='row'>" + task.name + "<br><button class='btn btn-primary btn-sm' type='button' onclick='selectTask(" + iTask + ")'>Media</button></th>")
+        taskRow.append("<th scope='row'>" + task.name + "<br><button class='btn btn-primary btn-sm' type='button' onclick='selectTask(" + task["id"] + ")'>Media</button></th>")
 
-        var iContestant = 1
         contestants.forEach(contestant => {
-            taskRow.append("<td class='text-center'><input type='number' id='score-" + iTask + "-" + iContestant + "' value='0' onchange='updateScore(" + iContestant + ")' style='width: 50px'/><br><span id='buttons-" + iTask + "-" + iContestant + "' class='buttons-span'></span></td>")
-            for (var i = 1; i <= contestants.length; i++) {
-                $("#buttons-" + iTask + "-" + iContestant).append("<button class='btn btn-outline-primary quick-score-button' style='width: auto' onclick='setScore(" + i + ", " + iTask + ", " + iContestant + ")'>" + i + "</button>")
+            var taskScore = contestant["scores"].find(s => s.taskId == task["id"])
+            if (typeof taskScore === "undefined") {
+                taskScore = 0
+            } else {
+                taskScore = taskScore["score"]
             }
-            iContestant++
+            taskRow.append("<td class='text-center'><input type='number' id='score-" 
+            + task["id"] + "-" + contestant["id"] + "' value='" + taskScore + "' onchange='updateScore(" + task["id"] + ", " + contestant["id"] + ")' style='width: 50px'/><br><span id='buttons-" + task["id"] + "-" + contestant["id"] + "' class='buttons-span'></span></td>")
+            for (var i = 1; i <= contestants.length; i++) {
+                $("#buttons-" + task["id"] + "-" + contestant["id"]).append("<button class='btn btn-outline-primary quick-score-button' style='width: auto' onclick='setScore(" + task["id"] + ", " + contestant["id"] + ", " + i + ")'>" + i + "</button>")
+            }
         })
-
-
-        iTask++
     })
 
 
     $('<tfoot><tr id="table-footer"><td>Total</td></tr></tfoot>').appendTo($("#task-table"))
 
-    var iContestant = 1
     contestants.forEach(contestant => {
-        $("#table-footer").append("<td id='total-score-" + iContestant + "'>0</td>")
-        iContestant++
+        $("#table-footer").append("<td id='total-score-" + contestant["id"] + "'>" + contestant["total_score"] + "</td>")
     })
 
-    var iTask = 1
     tasks.forEach(task => {
-        $("#task-selection").append("<div id='task-div-" + iTask + "' class='task-divs'></div>")
+        $("#task-selection").append("<div id='task-div-" + task["id"] + "' class='task-divs'></div>")
         task.images.forEach(img => {
-            $("#task-div-" + iTask).append(" ").append("<image src='./data/tasks/" + task.name + "/" + img + "' data-root='./data/tasks/" + task.name + "/" + img + "' style='width: 192px; height: 108px; cursor: pointer'  class='img-thumbnail' onclick='showImage(event)'></image>")
+            $("#task-div-" + task["id"]).append(" ").append("<image src='./data/tasks/" + task.name + "/" + img + "' data-root='./data/tasks/" + task.name + "/" + img + "' style='width: 192px; height: 108px; cursor: pointer'  class='img-thumbnail' onclick='showImage(event)'></image>")
         })
         task.videos.forEach(video => {
-            $("#task-div-" + iTask).append(" ").append("<button class='btn btn-primary' onclick='showVideo(event)' data-root='./data/tasks/" + task.name + "/" + video + "'>Video: " + video + "</button>")
+            $("#task-div-" + task["id"]).append(" ").append("<button class='btn btn-primary' onclick='showVideo(event)' data-root='./data/tasks/" + task.name + "/" + video + "'>Video: " + video + "</button>")
         })
-        iTask++
     })
     $(".task-divs").hide()
 
@@ -104,22 +148,24 @@ function play(event) {
     sendMessage("play")
 }
 
-function setScore(score, taskId, playerId) {
+function setScore(taskId, playerId, score) {
     $("#score-" + taskId + "-" + playerId).val(score)
-    updateScore(playerId)
+    updateScore(taskId, playerId)
 }
 
-function updateScore(playerId) {
-    console.log(playerId)
+function updateScore(taskId, playerId) {
+    var score = $("#score-" + taskId + "-" + playerId).val()
+    if (score == "") {
+        $("#score-" + taskId + "-" + playerId).val(0)
+        score = 0
+    }
     var newScore = 0
-    var iTask = 1
     tasks.forEach(task => {
-        newScore += parseFloat(document.getElementById("score-" + iTask + "-" + (playerId)).value)
-        iTask++
+        newScore += parseFloat(document.getElementById("score-" + task["id"] + "-" + (playerId)).value)
     })
     scores[playerId - 1] = newScore
-    document.getElementById("total-score-" + playerId).innerText = scores[playerId - 1]
-    sendMessage("setScore+++" + (playerId - 1) + "+++" + scores[playerId - 1])
+    document.getElementById("total-score-" + playerId).innerText = newScore
+    sendMessage("setScore+++" + taskId + "+++" + playerId + "+++" + score + "+++" + newScore)
 }
 
 setup()

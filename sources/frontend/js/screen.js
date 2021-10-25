@@ -8,13 +8,13 @@
 
 	// var main = document.querySelector("#div-scoreboard")
 
-	function addContestant(imagePath, id) {
+	function addContestant(imagePath, id, score) {
 		var contestant = {}
 
 		contestant.image = imagePath
-		contestant.score = 0
-		contestant.oldScore = 0
-        contestant.conId = id
+		contestant.score = score
+		contestant.oldScore = score
+        contestant.id = id
 
 		contestantsList.push(contestant)
 
@@ -36,7 +36,6 @@
 		var fill = document.createElement("div")
 		fill.classList.add("fill")
 		fill.style.backgroundImage = "url('" + con.image + "')"
-        console.log(con.image)
 
 		var shadow = document.createElement("div")
 		shadow.classList.add("shadow")
@@ -183,13 +182,40 @@
 		}, 10)
 	}
 
-    var iContestant = 0
-    contestants.forEach(contestant => {
-        addContestant("./data/contestants/" + contestant.filename, iContestant)
-        iContestant++
-    })
+    var contestants = []
 
-	refreshContestants()
+    function getContestants() {
+        var xhttp = new XMLHttpRequest()
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                contestants = JSON.parse(this.responseText)
+                contestants.sort((a, b) => a.name.localeCompare(b.name))
+                contestants.sort((a, b) => b["total_score"] - a["total_score"])
+                contestants.forEach(contestant => {
+                    addContestant("./data/contestants/" + contestant["img_source"], contestant["id"], contestant["total_score"])
+                })
+            
+                refreshContestants()
+            }
+        }
+        xhttp.open("GET", "/data/contestants", false)
+        xhttp.send()
+    }
+
+    function getSpecialImages() {
+        var xhttp = new XMLHttpRequest()
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                special_images = JSON.parse(this.responseText)
+            }
+        }
+        xhttp.open("GET", "/data/special_images", false)
+        xhttp.send()
+    }
+    
+    getSpecialImages()
+    getContestants()
+
 
     document.querySelector("#image-taskmaster").src = "./data/" + special_images.find(img => {
         return img.name.toLowerCase() == "taskmaster"
@@ -207,16 +233,15 @@
         }
     }
 
-    var ws = new WebSocket("ws://" + ip_address + ":8001/ws")
+    var ws = new WebSocket("ws://" + window.location.host + "/ws")
     ws.onmessage = function(event) {
+        console.log("received msg '" + event.data + "'")
         var content = event.data.split("+++")
-        console.log("received msg '" + content + "'")
         var action = content[0]
         if (action == "play") {
             play()
         } else if (action == "setScore") {
-            objIndex = contestantsList.findIndex(obj => obj.conId == content[1])
-            contestantsList[objIndex].score = content[2]
+            contestantsList.find(c => c.id == content[2]).score = content[4]
         } else if (action == "showImage") {
             document.querySelector("#image").src = content[1]
             showDiv("image")
