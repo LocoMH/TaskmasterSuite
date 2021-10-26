@@ -1,5 +1,5 @@
 from tinydb import TinyDB, Query
-import helper
+from tm_suite import helper
 
 contestants = TinyDB(helper.find_root() + "/sources/db/contestants.json")
 tasks = TinyDB(helper.find_root() + "/sources/db/tasks.json")

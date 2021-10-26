@@ -1,15 +1,15 @@
 import threading
-import logging
 from typing import List
 from fastapi import FastAPI, WebSocket, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.websockets import WebSocketDisconnect
 import uvicorn
 import multiprocessing
-from loader import generate_files
+from tm_suite.loader import generate_files
+from tm_suite import helper
+from tm_suite import db
 import ctypes
-import helper
-import db
+import easygui
 
 app = FastAPI()
 
@@ -77,8 +77,8 @@ def start_file_generation():
 
 
 def show_window():
-    ctypes.windll.user32.MessageBoxW(
-        0, "The Taskmaster Suite was succesfully launched!\n\nConnect to\n\nhttp://" + helper.get_ip() + ":8001/home/screen.html\n\nand\n\nhttp://" + helper.get_ip() + ":8001/home/assistant.html\n\non any computer in your network in order to use the application.\n\nNote that closing this window does not stop the application. Closing the command prompt window does.", "Successfully started", 0)
+    easygui.msgbox("The Taskmaster Suite was succesfully launched!\n\nConnect to\n\nhttp://" + helper.get_ip() + ":8001/home/screen.html\n\nand\n\nhttp://" + helper.get_ip() +
+                   ":8001/home/assistant.html\n\non any computer in your network in order to use the application.\n\nNote that closing this window does not stop the application. Closing the command prompt window does.", "Successfully started")
 
 
 @app.on_event("startup")
@@ -91,6 +91,11 @@ async def startup_event():
     file_generation_thread.daemon = True
     file_generation_thread.start()
 
-if __name__ == "__main__":
+
+def start_server():
     multiprocessing.freeze_support()
     uvicorn.run(app, host="0.0.0.0", port=8001, loop='asyncio')
+
+
+if __name__ == "__main__":
+    start_server()

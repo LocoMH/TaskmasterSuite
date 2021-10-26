@@ -1,6 +1,6 @@
 import os
-import helper
-import db
+from tm_suite import helper
+from tm_suite import db
 
 
 def check_for_contestants(root: str):
