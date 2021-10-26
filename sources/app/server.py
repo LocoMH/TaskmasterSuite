@@ -73,7 +73,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 def start_file_generation():
     generate_files()
-    threading.Timer(2.5, start_file_generation).start()
+    threading.Timer(1, start_file_generation).start()
 
 
 def show_window():
