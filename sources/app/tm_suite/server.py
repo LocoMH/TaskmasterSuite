@@ -9,6 +9,8 @@ from tm_suite.loader import generate_files
 from tm_suite import helper
 from tm_suite import db
 import easygui
+import ujson
+import asyncio
 
 app = FastAPI()
 
@@ -32,6 +34,8 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 app.mount("/home/", StaticFiles(directory=helper.find_root()), name="static")
+app.mount("/exp/", StaticFiles(directory=helper.find_root() +
+          "/sources/frontend_vue"), name="static")
 
 
 @app.get("/data/contestants")

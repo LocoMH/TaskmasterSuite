@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <link href="./fonts/veteran_typewriter.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div id="app">
+        <v-app dark>
+                <v-app-bar app style="font-family: 'veteran_typewriterregular', sans-serif; font-size: 150%;">
+                    <v-avatar
+                        size="30"
+                        :color="websocketConnected ? 'success' : 'error'"
+                    >
+                        <v-icon v-if="websocketConnected">mdi-check</v-icon>
+                        <v-icon v-else>mdi-close</v-icon>
+                    </v-avatar>
+                    <v-spacer></v-spacer>
+                    <img class="mr-3" src="./icon.png" width="50">
+                        <h3 class="font-weight-regular">
+                            Taskmaster Suite
+                        </h3>
+                    <v-spacer></v-spacer>
+                    <v-switch
+                        v-model="darkMode"
+                        dense
+                        hide-details
+                    >
+                        <template v-slot:label>
+                            <v-icon>mdi-moon-waxing-crescent</v-icon>
+                        </template>
+                    </v-switch>
+                </v-app-bar>
+                <v-main>
+                    <v-container fluid>
+                        <h3>
+                            Basic Controls
+                        </h3>
+                        <v-btn class="ma-1" color="primary">Show Taskmaster</v-btn>
+                        <v-btn class="ma-1" color="primary">Show Scoreboard</v-btn>
+                        <v-btn class="ma-1" color="primary">Update Scoreboard</v-btn>
+                        <br>
+                        <v-btn v-for="item in filteredSpecialImages" :key="item.name" class="ma-1 mr-2" color="primary">Show {{item.name}}</v-btn>
+                    </v-container>
+                    <v-divider></v-divider>
+                    <v-container fluid>
+                        <h3>
+                            Scores
+                        </h3>
+
+                        <v-simple-table
+                            fixed-header
+                            height="500"
+                        >
+                            <template v-slot:default>
+                                <thead>
+                                    <tr style="height: 100px">
+                                        <th class="text-left">
+                                            Task
+                                        </th>
+                                        <th v-for="item in contestants" :key="item.name">
+                                            {{ item.name }}
+                                            <!-- <br>
+                                                Score: 
+                                                <v-chip
+                                                left
+                                                class="green pa-2"
+                                                small
+                                                >
+                                                {{ item.total_score }}
+                                            </v-chip> Rank:
+                                            <v-chip
+                                            left
+                                            class="green pa-2"
+                                            small
+                                            >
+                                            4
+                                        </v-chip> -->
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                    v-for="item in tasks"
+                                    :key="item.name"
+                                    > 
+                                    <td>
+                                        <v-btn small color="primary">
+                                            {{ item.name }}
+                                        </v-btn>
+                                    </td>
+                                    <td v-for="item in contestants" :key="item.name">
+                                        <v-text-field
+                                        hide-details
+                                            type="number"
+                                            solo
+                                            light
+                                            value="0"
+                                            style="width: 70px"
+                                            dense
+                                            />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </template>
+                    </v-container>
+                    <v-divider></v-divider>
+                    <v-container fluid>
+                        <h3>
+                            Task selected: {{selectedTask.name}}
+                        </h3>
+
+                    </v-container>
+                </v-simple-table>
+            </v-main>
+        </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify({
+                theme: { dark: true },
+            }),        
+            data() {
+                return {
+                    message: "Hello World",
+                    darkMode: true,
+                    selectedTask: {
+                        name: "-",
+                        images: [],
+                        videos: []
+                    },
+                    special_images: [],
+                    tasks: [],
+                    contestants: [],
+                    websocket: null,
+                    websocketConnected: false
+                }
+            },
+            methods: {
+                loadTasks() {
+                    axios
+                    .get('/data/tasks')
+                    .then(response => {
+                        this.tasks = response.data
+                    })
+                    .then(() => {
+                        setTimeout(() => this.loadTasks(), 1000)
+                    })
+                },
+                loadContestants() {
+                    axios.get("/data/contestants")
+                    .then(response => {
+                        this.contestants = response.data
+                    })
+                    .then(() => {
+                        setTimeout(() => this.loadContestants(), 1000)
+                    })
+                },
+                loadSpecialImages() {
+                    axios.get("/data/special_images")
+                    .then(response => {
+                        this.special_images = response.data
+                    })
+                    .then(() => {
+                        setTimeout(() => this.loadSpecialImages(), 1000)
+                    })
+                },
+                connectToWebsocket() {
+                    if (this.websocket === null) {
+                        var vm = this
+                        this.websocket = new WebSocket("ws://" + location.hostname + ":8001/ws")
+                        this.websocket.onmessage = function(event) {
+                            console.log(event.data)
+                        }
+
+                        this.websocket.onopen = () => {
+                            console.log('websocket connected')
+                            this.websocketConnected = true
+                        }
+                        
+                        this.websocket.onclose = (event) => {
+                            console.log('websocket disconnected')
+                            this.websocketConnected = false
+                            this.websocket = null
+                            setTimeout(() => vm.connectToWebsocket(), 1000)
+                        }
+                    }
+
+                },
+                selectTask() {
+
+                }
+            },
+            beforeMount() {
+                this.loadTasks()
+                this.loadContestants()
+                this.loadSpecialImages()
+                this.connectToWebsocket()
+            },
+            watch: {
+                darkMode: function(val) {
+                    this.$vuetify.theme.dark = val
+                }
+            },
+            computed: {
+                filteredSpecialImages() {
+                    return this.special_images.filter(img => img.name.toLowerCase() != "taskmaster")
+                }
+            }
+        })
+    </script>
+</body>
+</html>

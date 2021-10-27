@@ -1,6 +1,7 @@
 import os
 from tm_suite import helper
 from tm_suite import db
+import ujson
 
 
 def check_for_contestants(root: str):
