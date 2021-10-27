@@ -9,7 +9,7 @@ As of now, the official releases contain only a Windows version. However as this
 
 In order to install the necessary packages, browse to sources/app and install the project via
 
-```pip install .```.
+```pip install .```
 
 Of course I can only recommend to use a virtual environment for this.
 Once installed, simply execute
