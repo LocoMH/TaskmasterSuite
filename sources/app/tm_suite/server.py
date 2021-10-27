@@ -8,7 +8,6 @@ import multiprocessing
 from tm_suite.loader import generate_files
 from tm_suite import helper
 from tm_suite import db
-import ctypes
 import easygui
 
 app = FastAPI()
