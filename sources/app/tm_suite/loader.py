@@ -13,15 +13,15 @@ async def check_for_contestants(root: str):
         "img_source": file
     } for file in files]
 
-    oldContestants = db.get_raw_contestants()
+    oldContestants = await db.get_raw_contestants()
 
     for contestant in newContestants:
         if not any(contestant["name"] == oldContestant["name"] for oldContestant in oldContestants):
-            db.add_contestant(contestant["name"], contestant["img_source"])
+            await db.add_contestant(contestant["name"], contestant["img_source"])
 
     for contestant in oldContestants:
         if not any(contestant["name"] == newContestant["name"] for newContestant in newContestants):
-            db.remove_contestant(contestant["name"])
+            await db.remove_contestant(contestant["name"])
 
 
 async def check_for_tasks(root: str):
@@ -38,18 +38,18 @@ async def check_for_tasks(root: str):
         ]
     } for task in files]
 
-    oldTasks = db.get_raw_tasks()
+    oldTasks = await db.get_raw_tasks()
 
     for task in newTasks:
         if not any(task["name"] == oldTask["name"] for oldTask in oldTasks):
-            db.add_task(task["name"], task["images"], task["videos"])
+            await db.add_task(task["name"], task["images"], task["videos"])
 
     for task in oldTasks:
         if not any(task["name"] == newTask["name"] for newTask in newTasks):
-            db.remove_task(task["name"])
+            await db.remove_task(task["name"])
 
     for task in newTasks:
-        db.update_task(task["name"], task["images"], task["videos"])
+        await db.update_task(task["name"], task["images"], task["videos"])
 
 
 async def check_for_special_images(root: str):
@@ -61,16 +61,16 @@ async def check_for_special_images(root: str):
         "img_source": img
     } for img in files]
 
-    oldSpecialImages = db.get_special_images()
+    oldSpecialImages = await db.get_special_images()
 
     for special_image in newSpecialImages:
         if not any(special_image["name"] == oldSpecialImage["name"] for oldSpecialImage in oldSpecialImages):
-            db.add_special_image(
+            await db.add_special_image(
                 special_image["name"], special_image["img_source"])
 
     for special_image in oldSpecialImages:
         if not any(special_image["name"] == newSpecialImage["name"] for newSpecialImage in newSpecialImages):
-            db.remove_special_image(special_image["name"])
+            await db.remove_special_image(special_image["name"])
 
 
 async def generate_files():

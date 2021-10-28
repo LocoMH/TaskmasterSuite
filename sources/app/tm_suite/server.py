@@ -40,22 +40,22 @@ app.mount("/exp/", StaticFiles(directory=helper.find_root() +
 
 @app.get("/data/contestants")
 async def get_contestants():
-    return db.get_contestants()
+    return await db.get_contestants()
 
 
 @app.get("/data/tasks")
 async def get_tasks():
-    return db.get_tasks()
+    return await db.get_tasks()
 
 
 @app.get("/data/special_images")
 async def get_special_images():
-    return db.get_special_images()
+    return await db.get_special_images()
 
 
 @app.delete("/data/scores")
 async def delete_scores():
-    db.clear_scores()
+    await db.clear_scores()
     return Response(status_code=204)
 
 
@@ -67,7 +67,7 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await websocket.receive_text()
             data_list = data.split("+++")
             if data_list[0] == "setScore":
-                db.add_score(data_list[1], data_list[2], data_list[3])
+                await db.add_score(data_list[1], data_list[2], data_list[3])
 
             await manager.broadcast(data)
     except WebSocketDisconnect:
