@@ -1,6 +1,6 @@
 import os
-from tm_suite import helper
-from tm_suite import db
+from . import helper
+from . import db
 import ujson
 
 

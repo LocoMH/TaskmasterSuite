@@ -53,6 +53,11 @@ async def get_special_images():
     return await db.get_special_images()
 
 
+@app.get("/data/scores")
+async def get_scores():
+    return await db.get_scores()
+
+
 @app.delete("/data/scores")
 async def delete_scores():
     await db.clear_scores()

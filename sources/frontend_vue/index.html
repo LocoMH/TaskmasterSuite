@@ -38,21 +38,65 @@
                         <h3>
                             Basic Controls
                         </h3>
-                        <v-btn class="ma-1" color="primary">Show Taskmaster</v-btn>
-                        <v-btn class="ma-1" color="primary">Show Scoreboard</v-btn>
-                        <v-btn class="ma-1" color="primary">Update Scoreboard</v-btn>
+                        <v-btn class="ma-1" color="primary" @click="sendMessage('showTaskmaster')">Show Taskmaster</v-btn>
+                        <v-btn class="ma-1" color="primary" @click="sendMessage('showScoreboard')">Show Scoreboard</v-btn>
+                        <v-btn class="ma-1" color="primary" @click="sendMessage('play')">Update Scoreboard</v-btn>
                         <br>
-                        <v-btn v-for="item in filteredSpecialImages" :key="item.name" class="ma-1 mr-2" color="primary">Show {{item.name}}</v-btn>
+                        <v-btn v-for="item in filteredSpecialImages" :key="item.name" class="ma-1 mr-2" color="primary" @click="sendMessage('showImage+++./data/' + item.img_source)">Show {{item.name}}</v-btn>
                     </v-container>
                     <v-divider></v-divider>
                     <v-container fluid>
-                        <h3>
-                            Scores
-                        </h3>
+                        <v-layout row class="ma-1">
 
+                            <h3>
+                                Scores
+                            </h3>
+                            <v-spacer></v-spacer>
+                                <v-dialog
+                                    v-model="resetDialog"
+                                    width="500"
+                                >
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                        color="primary"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                        small
+                                    >
+                                        Reset all scores
+                                    </v-btn>
+                                </template>
+                            
+                                <v-card light>
+                                    <v-card-title>
+                                        Reset all scores
+                                    </v-card-title>
+                                    <v-divider></v-divider>
+                                    <v-card-text class="mt-4">
+                                        Are you sure you want to reset all scores to 0?
+                                    </v-card-text>
+                                    <v-divider></v-divider>
+                                    <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-btn
+                                            color="secondary"
+                                            @click="resetDialog = false"
+                                        >
+                                            Cancel
+                                        </v-btn>
+                                        <v-btn
+                                            color="primary"
+                                            @click="resetScores()"
+                                        >
+                                            Confirm
+                                        </v-btn>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-dialog>
+                        </v-layout>
                         <v-simple-table
                             fixed-header
-                            height="500"
+                            height="300"
                         >
                             <template v-slot:default>
                                 <thead>
@@ -62,49 +106,53 @@
                                         </th>
                                         <th v-for="item in contestants" :key="item.name">
                                             {{ item.name }}
-                                            <!-- <br>
-                                                Score: 
-                                                <v-chip
+                                            <br>
+                                            Score: 
+                                            <v-chip
+                                                left
+                                                class="pa-2"
+                                                color="primary"
+                                                small
+                                            >
+                                                {{ totalScores[item.id] }}
+                                            </v-chip> 
+                                            <!-- Rank:
+                                            <v-chip
                                                 left
                                                 class="green pa-2"
                                                 small
-                                                >
-                                                {{ item.total_score }}
-                                            </v-chip> Rank:
-                                            <v-chip
-                                            left
-                                            class="green pa-2"
-                                            small
                                             >
-                                            4
-                                        </v-chip> -->
+                                                4
+                                            </v-chip> -->
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr
-                                    v-for="item in tasks"
-                                    :key="item.name"
+                                        v-for="(task, tIndex) in tasks"
+                                        :key="task.id"
                                     > 
-                                    <td>
-                                        <v-btn small color="primary">
-                                            {{ item.name }}
-                                        </v-btn>
-                                    </td>
-                                    <td v-for="item in contestants" :key="item.name">
-                                        <v-text-field
-                                        hide-details
-                                            type="number"
-                                            solo
-                                            light
-                                            value="0"
-                                            style="width: 70px"
-                                            dense
+                                        <td>
+                                            <v-btn small color="primary" @click="selectedTask = task">
+                                                {{ task.name }}
+                                            </v-btn>
+                                        </td>
+                                        <td v-for="(contestant, cIndex) in contestants" :key="contestant.id">
+                                            <v-text-field
+                                                hide-details
+                                                solo
+                                                light
+                                                type="number"
+                                                v-model="internalScores[task.id][contestant.id]"
+                                                @input="updateScore(task.id, contestant.id)"
+                                                style="width: 70px"
+                                                dense
                                             />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </template>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </template>
+                        </v-simple-table>
                     </v-container>
                     <v-divider></v-divider>
                     <v-container fluid>
@@ -112,8 +160,36 @@
                             Task selected: {{selectedTask.name}}
                         </h3>
 
+                        <v-layout row wrap class="mt-2">
+                            <v-card class="ma-2" v-for="image in selectedTask.images" max-width="192">
+                                <v-img
+                                :src="'/home/data/tasks/' + selectedTask.name + '/' + image"
+                                height="108"
+                                width="192"
+                                class="grey darken-4"
+                                ></v-img>
+                                <v-card-actions>
+                                    <div class="text-caption">{{ image | removeExtension }}</div>
+                                    <v-spacer></v-spacer>
+                                    <v-btn color="primary" small @click="sendMessage('showImage+++./data/tasks/' + selectedTask.name + '/' + image)">Show</v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </v-layout>
+                        <v-layout row wrap class="mt-2">
+                            <v-card class="ma-2" v-for="video in selectedTask.videos" max-width="192">
+                                <v-card
+                                    height="108"
+                                    width="192"
+                                    class="grey darken-4 justify-center d-flex align-center"
+                                >Video</v-card>
+                                <v-card-actions>
+                                    <div class="text-caption">{{ video | removeExtension }}</div>
+                                    <v-spacer></v-spacer>
+                                    <v-btn color="primary" small @click="sendMessage('showVideo+++./data/tasks/' + selectedTask.name + '/' + video)">Show</v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </v-layout>
                     </v-container>
-                </v-simple-table>
             </v-main>
         </v-app>
     </div>
@@ -129,31 +205,118 @@
             }),        
             data() {
                 return {
-                    message: "Hello World",
                     darkMode: true,
                     selectedTask: {
+                        id: -1,
                         name: "-",
                         images: [],
                         videos: []
                     },
+                    resetDialog: false,
                     special_images: [],
                     tasks: [],
                     contestants: [],
+                    scores: [],
+                    internalScores: {},
+                    totalScores: {},
                     websocket: null,
-                    websocketConnected: false
+                    websocketConnected: false,
+                    ranks: {}
+                }
+            },
+            filters: {
+                removeExtension(val) {
+                    return val.replace(/\.[^/.]+$/, "")
                 }
             },
             methods: {
+                showImage(image) {
+                    this.sendMessage("showImage+++" + image)
+                },
+                createInternalScores() {
+                    this.internalScores = {}
+                    
+                    this.tasks.forEach(task => {
+                        this.internalScores[task.id] = {}
+                        this.contestants.forEach(contestant => {
+                            this.internalScores[task.id][contestant.id] = 0
+                        })
+                    })
+                    
+                    this.scores.forEach(score => {
+                        this.internalScores[score.taskId][score.contestantId] = score.score
+                    })
+
+                },
+                updateTotalScore() {
+                    this.totalScores = {}
+
+                    this.contestants.forEach(contestant => {
+                        this.totalScores[contestant.id] = 0
+                    })
+
+                    for (var taskId in this.internalScores) {
+                        for (var contestantId in this.internalScores[taskId]) {
+                            this.totalScores[contestantId] += parseFloat(this.internalScores[taskId][contestantId])
+                            this.totalScores[contestantId] = (this.totalScores[contestantId].toFixed(3) * 1)
+                        }
+                    }
+
+                    // this.ranks = Object.keys(this.totalScores).map(function(key) {
+                    //     return [key, this.totalScores[key]]
+                    // })
+
+                    // this.ranks.sort(function(first, second) {
+                    //     return second[1] - first[1]
+                    // })
+
+                    // console.log(this.ranks)
+                },
                 sendMessage(message) {
                     if (this.websocketConnected) {
-                        // this.websocket.
+                        console.log(" sending msg: " + message)
+                        this.websocket.send(message)
                     }
+                },
+                resetScores() {
+                    axios.delete('/data/scores')
+                    .then(response => { 
+                        this.resetDialog = false
+                        this.loadScores()
+                    })
                 },
                 loadTasks() {
                     axios
                     .get('/data/tasks')
                     .then(response => {
-                        this.tasks = response.data
+
+                        var isEqual = response.data.length === this.tasks.length
+
+                        if (isEqual) {
+                            for (var i in this.tasks) {
+                                var oldTask = this.tasks[i]
+                                if (!response.data.some(t => (t.id === oldTask.id) && (JSON.stringify(t.images) == JSON.stringify(oldTask.images)) && (JSON.stringify(t.videos) == JSON.stringify(oldTask.videos)))) {
+                                    isEqual = false
+                                    break
+                                }
+                            }
+                        }
+
+                        if (!isEqual) {
+                            this.tasks = response.data
+
+                            var newSelectedTask = this.tasks.filter(t => t.id == this.selectedTask.id)
+                            if (newSelectedTask.length === 0) {
+                                this.selectedTask = {
+                                    "id": -1,
+                                    "name": "-",
+                                    "images": [],
+                                    "videos": []
+                                }
+                            } else {
+                                this.selectedTask = newSelectedTask[0]
+                            }
+                        }
                     })
                     .then(() => {
                         setTimeout(() => this.loadTasks(), 1000)
@@ -162,7 +325,22 @@
                 loadContestants() {
                     axios.get("/data/contestants")
                     .then(response => {
-                        this.contestants = response.data
+
+                        var isEqual = response.data.length === this.contestants.length
+
+                        if (isEqual) {
+                            for (var i in this.contestants) {
+                                var oldContestant = this.contestants[i]
+                                if (!response.data.some(c => c.id === oldContestant.id)) {
+                                    isEqual = false
+                                    break
+                                }
+                            }
+                        }
+
+                        if (!isEqual) {
+                            this.contestants = response.data
+                        }
                     })
                     .then(() => {
                         setTimeout(() => this.loadContestants(), 1000)
@@ -177,12 +355,20 @@
                         setTimeout(() => this.loadSpecialImages(), 1000)
                     })
                 },
+                loadScores() {
+                    axios.get("/data/scores")
+                    .then(response => {
+                        this.scores = response.data
+                        this.createInternalScores()
+                        this.updateTotalScore()
+                    })
+                },
                 connectToWebsocket() {
                     if (this.websocket === null) {
                         var vm = this
                         this.websocket = new WebSocket("ws://" + location.hostname + ":8001/ws")
                         this.websocket.onmessage = function(event) {
-                            console.log(event.data)
+                            console.log("received msg: " + event.data)
                         }
 
                         this.websocket.onopen = () => {
@@ -201,17 +387,41 @@
                 },
                 selectTask() {
 
+                },
+                getScore(taskId, contestantId) {
+                    var filteredScores = this.scores.filter(s => (s.taskId == taskId) && (s.contestantId == contestantId))
+                    var score = 0
+                    if (filteredScores.length != 0) {
+                        score = filteredScores[0].score
+                    }
+                    return score
+                },
+                updateScore(taskId, contestantId) {
+                    var score = this.internalScores[taskId][contestantId]
+                    if (score !== '') {
+                        this.updateTotalScore()
+                        this.sendMessage("setScore+++" + taskId + "+++" + contestantId + "+++" + score + "+++" + this.totalScores[contestantId])
+                    }                    
                 }
             },
             beforeMount() {
                 this.loadTasks()
                 this.loadContestants()
+                this.loadScores()
                 this.loadSpecialImages()
                 this.connectToWebsocket()
             },
             watch: {
-                darkMode: function(val) {
+                darkMode(val) {
                     this.$vuetify.theme.dark = val
+                },
+                tasks() {
+                    this.createInternalScores()
+                    this.updateTotalScore()
+                },
+                contestants() {
+                    this.createInternalScores()
+                    this.updateTotalScore()
                 }
             },
             computed: {

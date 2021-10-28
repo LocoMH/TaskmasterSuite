@@ -19,6 +19,10 @@ async def remove_special_image(name: str):
     special_images.remove(Query().name == name)
 
 
+async def get_scores():
+    return scores.all()
+
+
 async def get_special_images():
     return special_images.all()
 
