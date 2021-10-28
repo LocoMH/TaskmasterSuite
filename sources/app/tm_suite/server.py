@@ -5,9 +5,9 @@ from fastapi.staticfiles import StaticFiles
 from starlette.websockets import WebSocketDisconnect
 import uvicorn
 import multiprocessing
-from tm_suite.loader import generate_files
-from tm_suite import helper
-from tm_suite import db
+from .loader import generate_files
+from . import helper
+from . import db
 import easygui
 import ujson
 import asyncio
@@ -74,9 +74,10 @@ async def websocket_endpoint(websocket: WebSocket):
         manager.disconnect(websocket)
 
 
-def start_file_generation():
-    generate_files()
-    threading.Timer(1, start_file_generation).start()
+async def start_file_generation():
+    while True:
+        await generate_files()
+        await asyncio.sleep(1)
 
 
 def show_window():
@@ -86,13 +87,12 @@ def show_window():
 
 @app.on_event("startup")
 async def startup_event():
-    file_generation_thread = threading.Timer(0, start_file_generation)
-    file_generation_thread.daemon = True
-    file_generation_thread.start()
-
     file_generation_thread = threading.Timer(0, show_window)
     file_generation_thread.daemon = True
     file_generation_thread.start()
+
+    loop = asyncio.get_running_loop()
+    loop.create_task(start_file_generation())
 
 
 def start_server():

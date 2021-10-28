@@ -4,7 +4,7 @@ from tm_suite import db
 import ujson
 
 
-def check_for_contestants(root: str):
+async def check_for_contestants(root: str):
     files = [f for f in os.listdir(
         root + "/data/contestants") if f.endswith((".jpg", ".png", ".jpeg"))]
 
@@ -24,7 +24,7 @@ def check_for_contestants(root: str):
             db.remove_contestant(contestant["name"])
 
 
-def check_for_tasks(root: str):
+async def check_for_tasks(root: str):
     files = [f.rsplit(".", 1)[0] for f in os.listdir(
         root + "/data/tasks")]
 
@@ -52,7 +52,7 @@ def check_for_tasks(root: str):
         db.update_task(task["name"], task["images"], task["videos"])
 
 
-def check_for_special_images(root: str):
+async def check_for_special_images(root: str):
     files = [f for f in os.listdir(
         root + "/data") if f.endswith((".jpg", ".png", ".jpeg"))]
 
@@ -73,14 +73,14 @@ def check_for_special_images(root: str):
             db.remove_special_image(special_image["name"])
 
 
-def generate_files():
+async def generate_files():
     root = helper.find_root()
     if root is None:
         print("error - could not find root directory which includes 'data' directory!")
     else:
-        check_for_contestants(root)
-        check_for_tasks(root)
-        check_for_special_images(root)
+        await check_for_contestants(root)
+        await check_for_tasks(root)
+        await check_for_special_images(root)
 
 
 if __name__ == "__main__":
