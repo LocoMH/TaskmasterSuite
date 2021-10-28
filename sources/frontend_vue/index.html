@@ -144,6 +144,11 @@
                 }
             },
             methods: {
+                sendMessage(message) {
+                    if (this.websocketConnected) {
+                        // this.websocket.
+                    }
+                },
                 loadTasks() {
                     axios
                     .get('/data/tasks')
