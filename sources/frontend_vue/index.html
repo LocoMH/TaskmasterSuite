@@ -5,6 +5,7 @@
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
     <link href="./fonts/veteran_typewriter.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
 </head>
 <body>
     <div id="app">
@@ -52,10 +53,11 @@
                                 Scores
                             </h3>
                             <v-spacer></v-spacer>
-                                <v-dialog
-                                    v-model="resetDialog"
-                                    width="500"
-                                >
+                            <v-dialog
+                                v-model="resetDialog"
+                                width="500"
+                                overlay-opacity="0.8"
+                            >
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-btn
                                         color="primary"
@@ -67,7 +69,7 @@
                                     </v-btn>
                                 </template>
                             
-                                <v-card light>
+                                <v-card>
                                     <v-card-title>
                                         Reset all scores
                                     </v-card-title>
@@ -138,16 +140,74 @@
                                             </v-btn>
                                         </td>
                                         <td v-for="(contestant, cIndex) in contestants" :key="contestant.id">
-                                            <v-text-field
-                                                hide-details
-                                                solo
-                                                light
-                                                type="number"
-                                                v-model="internalScores[task.id][contestant.id]"
-                                                @input="updateScore(task.id, contestant.id)"
-                                                style="width: 70px"
-                                                dense
-                                            />
+                                            <v-row no-gutters style="width: 100px;">
+                                                <v-col>
+                                                    <v-text-field
+                                                        hide-details
+                                                        solo
+                                                        light
+                                                        height="40px"
+                                                        type="number"
+                                                        v-model="internalScores[task.id][contestant.id]"
+                                                        @input="updateScore(task.id, contestant.id)"
+                                                        style="min-width: 60px; max-width: 60px; border-top-right-radius: 0; border-bottom-right-radius: 0;"
+                                                        dense
+                                                    ></v-text-field>
+                                                </v-col>
+                                                <v-col>
+
+                                                    <v-menu
+                                                    bottom
+                                                    left
+                                                    offset-y
+                                                    close-on-content-click
+                                                    >
+                                                    <template v-slot:activator="{ on, attrs }">
+                                                        <v-btn 
+                                                            height="40px" 
+                                                            color="primary" 
+                                                            min-width="0" 
+                                                            width="20" 
+                                                            style="border-top-left-radius: 0; border-bottom-left-radius: 0;"
+                                                            v-bind="attrs"
+                                                            v-on="on"
+                                                            >
+                                                            <v-icon>
+                                                                mdi-numeric
+                                                            </v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <v-card color="grey" class="pa-2">
+                                                        <v-row dense>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '0')">0</v-btn>
+                                                            </v-col>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '1')">1</v-btn>
+                                                            </v-col>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '2')">2</v-btn>
+                                                            </v-col>
+                                                        </v-row>
+                                                        <v-row dense>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '3')">3</v-btn>
+                                                            </v-col>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '4')">4</v-btn>
+                                                            </v-col>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '5')">5</v-btn>
+                                                            </v-col>
+                                                        </v-row>
+                                                    </v-card>
+                                                </v-menu>
+                                            </v-col>
+                                            <v-spacer></v-spacer>
+                                            </v-row>
+                                            <!-- for (var i = 1; i <= contestants.length; i++) {
+                                                $("#buttons-" + task["id"] + "-" + contestant["id"]).append("<button class='btn btn-outline-primary quick-score-button' style='width: auto' onclick='setScore(" + task["id"] + ", " + contestant["id"] + ", " + i + ")'>" + i + "</button>")
+                                            } -->
                                         </td>
                                     </tr>
                                 </tbody>
@@ -161,7 +221,7 @@
                         </h3>
 
                         <v-layout row wrap class="mt-2">
-                            <v-card class="ma-2" v-for="image in selectedTask.images" max-width="192">
+                            <v-card class="ma-2" v-for="image in selectedTask.images" :key="image" max-width="192">
                                 <v-img
                                 :src="'/home/data/tasks/' + selectedTask.name + '/' + image"
                                 height="108"
@@ -176,16 +236,64 @@
                             </v-card>
                         </v-layout>
                         <v-layout row wrap class="mt-2">
-                            <v-card class="ma-2" v-for="video in selectedTask.videos" max-width="192">
+                            <v-card class="ma-2" v-for="video in selectedTask.videos" :key="video" max-width="192">
                                 <v-card
-                                    height="108"
+                                    height="50"
                                     width="192"
-                                    class="grey darken-4 justify-center d-flex align-center"
+                                    class="justify-center d-flex align-center"
                                 >Video</v-card>
                                 <v-card-actions>
                                     <div class="text-caption">{{ video | removeExtension }}</div>
                                     <v-spacer></v-spacer>
                                     <v-btn color="primary" small @click="sendMessage('showVideo+++./data/tasks/' + selectedTask.name + '/' + video)">Show</v-btn>
+                                </v-card-actions>
+                            </v-card>
+                            <v-card class="ma-2" v-for="note in selectedTask.notes" :key="note.file" max-width="192">
+                                <v-card
+                                    height="50"
+                                    width="192"
+                                    class="justify-center d-flex align-center"
+                                >Note</v-card>
+                                <v-card-actions>
+                                    <div class="text-caption">{{ note.file | removeExtension }}</div>
+                                    <v-spacer></v-spacer>
+                                    <v-dialog
+                                        v-model="resetDialog"
+                                        min-width="400"
+                                        max-width="700"
+                                        overlay-opacity="0.8"
+                                    >
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-btn
+                                                color="primary"
+                                                v-bind="attrs"
+                                                v-on="on"
+                                                small
+                                            >
+                                                Open
+                                            </v-btn>
+                                        </template>
+                                    
+                                        <v-card>
+                                            <v-card-title>
+                                                Note: {{ note.file | removeExtension }}
+                                            </v-card-title>
+                                            <v-divider></v-divider>
+                                            <v-card-text class="mt-4">
+                                                <span :inner-html.prop="note.text | replaceNewLines"></span>
+                                            </v-card-text>
+                                            <v-divider></v-divider>
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn
+                                                    color="secondary"
+                                                    @click="resetDialog = false"
+                                                >
+                                                    Close
+                                                </v-btn>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-dialog>
                                 </v-card-actions>
                             </v-card>
                         </v-layout>
@@ -194,242 +302,10 @@
         </v-app>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
-    <script>
-        new Vue({
-            el: '#app',
-            vuetify: new Vuetify({
-                theme: { dark: true },
-            }),        
-            data() {
-                return {
-                    darkMode: true,
-                    selectedTask: {
-                        id: -1,
-                        name: "-",
-                        images: [],
-                        videos: []
-                    },
-                    resetDialog: false,
-                    special_images: [],
-                    tasks: [],
-                    contestants: [],
-                    scores: [],
-                    internalScores: {},
-                    totalScores: {},
-                    websocket: null,
-                    websocketConnected: false,
-                    ranks: {}
-                }
-            },
-            filters: {
-                removeExtension(val) {
-                    return val.replace(/\.[^/.]+$/, "")
-                }
-            },
-            methods: {
-                showImage(image) {
-                    this.sendMessage("showImage+++" + image)
-                },
-                createInternalScores() {
-                    this.internalScores = {}
-                    
-                    this.tasks.forEach(task => {
-                        this.internalScores[task.id] = {}
-                        this.contestants.forEach(contestant => {
-                            this.internalScores[task.id][contestant.id] = 0
-                        })
-                    })
-                    
-                    this.scores.forEach(score => {
-                        this.internalScores[score.taskId][score.contestantId] = score.score
-                    })
-
-                },
-                updateTotalScore() {
-                    this.totalScores = {}
-
-                    this.contestants.forEach(contestant => {
-                        this.totalScores[contestant.id] = 0
-                    })
-
-                    for (var taskId in this.internalScores) {
-                        for (var contestantId in this.internalScores[taskId]) {
-                            this.totalScores[contestantId] += parseFloat(this.internalScores[taskId][contestantId])
-                            this.totalScores[contestantId] = (this.totalScores[contestantId].toFixed(3) * 1)
-                        }
-                    }
-
-                    // this.ranks = Object.keys(this.totalScores).map(function(key) {
-                    //     return [key, this.totalScores[key]]
-                    // })
-
-                    // this.ranks.sort(function(first, second) {
-                    //     return second[1] - first[1]
-                    // })
-
-                    // console.log(this.ranks)
-                },
-                sendMessage(message) {
-                    if (this.websocketConnected) {
-                        console.log(" sending msg: " + message)
-                        this.websocket.send(message)
-                    }
-                },
-                resetScores() {
-                    axios.delete('/data/scores')
-                    .then(response => { 
-                        this.resetDialog = false
-                        this.loadScores()
-                    })
-                },
-                loadTasks() {
-                    axios
-                    .get('/data/tasks')
-                    .then(response => {
-
-                        var isEqual = response.data.length === this.tasks.length
-
-                        if (isEqual) {
-                            for (var i in this.tasks) {
-                                var oldTask = this.tasks[i]
-                                if (!response.data.some(t => (t.id === oldTask.id) && (JSON.stringify(t.images) == JSON.stringify(oldTask.images)) && (JSON.stringify(t.videos) == JSON.stringify(oldTask.videos)))) {
-                                    isEqual = false
-                                    break
-                                }
-                            }
-                        }
-
-                        if (!isEqual) {
-                            this.tasks = response.data
-
-                            var newSelectedTask = this.tasks.filter(t => t.id == this.selectedTask.id)
-                            if (newSelectedTask.length === 0) {
-                                this.selectedTask = {
-                                    "id": -1,
-                                    "name": "-",
-                                    "images": [],
-                                    "videos": []
-                                }
-                            } else {
-                                this.selectedTask = newSelectedTask[0]
-                            }
-                        }
-                    })
-                    .then(() => {
-                        setTimeout(() => this.loadTasks(), 1000)
-                    })
-                },
-                loadContestants() {
-                    axios.get("/data/contestants")
-                    .then(response => {
-
-                        var isEqual = response.data.length === this.contestants.length
-
-                        if (isEqual) {
-                            for (var i in this.contestants) {
-                                var oldContestant = this.contestants[i]
-                                if (!response.data.some(c => c.id === oldContestant.id)) {
-                                    isEqual = false
-                                    break
-                                }
-                            }
-                        }
-
-                        if (!isEqual) {
-                            this.contestants = response.data
-                        }
-                    })
-                    .then(() => {
-                        setTimeout(() => this.loadContestants(), 1000)
-                    })
-                },
-                loadSpecialImages() {
-                    axios.get("/data/special_images")
-                    .then(response => {
-                        this.special_images = response.data
-                    })
-                    .then(() => {
-                        setTimeout(() => this.loadSpecialImages(), 1000)
-                    })
-                },
-                loadScores() {
-                    axios.get("/data/scores")
-                    .then(response => {
-                        this.scores = response.data
-                        this.createInternalScores()
-                        this.updateTotalScore()
-                    })
-                },
-                connectToWebsocket() {
-                    if (this.websocket === null) {
-                        var vm = this
-                        this.websocket = new WebSocket("ws://" + location.hostname + ":8001/ws")
-                        this.websocket.onmessage = function(event) {
-                            console.log("received msg: " + event.data)
-                        }
-
-                        this.websocket.onopen = () => {
-                            console.log('websocket connected')
-                            this.websocketConnected = true
-                        }
-                        
-                        this.websocket.onclose = (event) => {
-                            console.log('websocket disconnected')
-                            this.websocketConnected = false
-                            this.websocket = null
-                            setTimeout(() => vm.connectToWebsocket(), 1000)
-                        }
-                    }
-
-                },
-                selectTask() {
-
-                },
-                getScore(taskId, contestantId) {
-                    var filteredScores = this.scores.filter(s => (s.taskId == taskId) && (s.contestantId == contestantId))
-                    var score = 0
-                    if (filteredScores.length != 0) {
-                        score = filteredScores[0].score
-                    }
-                    return score
-                },
-                updateScore(taskId, contestantId) {
-                    var score = this.internalScores[taskId][contestantId]
-                    if (score !== '') {
-                        this.updateTotalScore()
-                        this.sendMessage("setScore+++" + taskId + "+++" + contestantId + "+++" + score + "+++" + this.totalScores[contestantId])
-                    }                    
-                }
-            },
-            beforeMount() {
-                this.loadTasks()
-                this.loadContestants()
-                this.loadScores()
-                this.loadSpecialImages()
-                this.connectToWebsocket()
-            },
-            watch: {
-                darkMode(val) {
-                    this.$vuetify.theme.dark = val
-                },
-                tasks() {
-                    this.createInternalScores()
-                    this.updateTotalScore()
-                },
-                contestants() {
-                    this.createInternalScores()
-                    this.updateTotalScore()
-                }
-            },
-            computed: {
-                filteredSpecialImages() {
-                    return this.special_images.filter(img => img.name.toLowerCase() != "taskmaster")
-                }
-            }
-        })
-    </script>
+    <script src="js/reconnecting-websocket.min.js"></script>
+    <script src="js/assistant.js"></script>
 </body>
 </html>

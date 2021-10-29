@@ -35,6 +35,12 @@ async def check_for_tasks(root: str):
         ],
         "videos": [
             video for video in os.listdir(root + "/data/tasks/" + task) if video.endswith(".mp4")
+        ],
+        "notes": [{
+            "file": note,
+            "text": open(root + "/data/tasks/" + task + "/" + note, "r").read()
+        }
+            for note in os.listdir(root + "/data/tasks/" + task) if note.endswith(".txt")
         ]
     } for task in files]
 
@@ -49,7 +55,7 @@ async def check_for_tasks(root: str):
             await db.remove_task(task["name"])
 
     for task in newTasks:
-        await db.update_task(task["name"], task["images"], task["videos"])
+        await db.update_task(task["name"], task["images"], task["videos"], task["notes"])
 
 
 async def check_for_special_images(root: str):

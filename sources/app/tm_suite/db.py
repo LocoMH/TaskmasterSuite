@@ -57,7 +57,8 @@ async def get_tasks():
         "id": t.doc_id,
         "name": t["name"],
         "images": t["images"],
-        "videos": t["videos"]
+        "videos": t["videos"],
+        "notes": t["notes"]
     } for t in tasks]
     return result
 
@@ -81,18 +82,20 @@ async def get_contestants():
     return result
 
 
-async def add_task(name, images, videos):
+async def add_task(name, images, videos, notes):
     return tasks.insert({
         "name": name,
         "images": images,
-        "videos": videos
+        "videos": videos,
+        "notes": notes
     })
 
 
-async def update_task(name, images, videos):
+async def update_task(name, images, videos, notes):
     tasks.update({
         "images": images,
-        "videos": videos
+        "videos": videos,
+        "notes": notes
     }, Query().name == name)
 
 

@@ -70,11 +70,15 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
+            print("received msg: " + data)
             data_list = data.split("+++")
             if data_list[0] == "setScore":
                 await db.add_score(data_list[1], data_list[2], data_list[3])
 
-            await manager.broadcast(data)
+            if data_list[0] == "__ping__":
+                await websocket.send_text("__pong__")
+            else:
+                await manager.broadcast(data)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
