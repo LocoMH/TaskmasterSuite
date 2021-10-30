@@ -4,9 +4,12 @@ from . import db
 import ujson
 
 
+ALLOWED_IMG_EXTENSIONS = (".jpg", ".png", ".jpeg", ".bmp", ".gif")
+
+
 async def check_for_contestants(root: str):
     files = [f for f in os.listdir(
-        root + "/data/contestants") if f.endswith((".jpg", ".png", ".jpeg"))]
+        root + "/data/contestants") if f.endswith(ALLOWED_IMG_EXTENSIONS)]
 
     newContestants = [{
         "name": file.rsplit(".", 1)[0],
@@ -31,7 +34,7 @@ async def check_for_tasks(root: str):
     newTasks = [{
         "name": task,
         "images": [
-            img for img in os.listdir(root + "/data/tasks/" + task) if img.endswith((".png", ".jpg", ".jpeg"))
+            img for img in os.listdir(root + "/data/tasks/" + task) if img.endswith(ALLOWED_IMG_EXTENSIONS)
         ],
         "videos": [
             video for video in os.listdir(root + "/data/tasks/" + task) if video.endswith(".mp4")
@@ -60,7 +63,7 @@ async def check_for_tasks(root: str):
 
 async def check_for_special_images(root: str):
     files = [f for f in os.listdir(
-        root + "/data") if f.endswith((".jpg", ".png", ".jpeg"))]
+        root + "/data") if f.endswith(ALLOWED_IMG_EXTENSIONS)]
 
     newSpecialImages = [{
         "name": img.rsplit(".", 1)[0].capitalize(),
