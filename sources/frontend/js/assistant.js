@@ -82,13 +82,13 @@ new Vue({
             }
         },
         resetScores() {
-            this.sendMessage("resetScores")
             axios.delete('/data/scores')
             .then(response => { 
                 this.resetDialog = false
                 this.scores = []
                 this.internalScores = {}
                 this.resetInternalScores()
+                this.sendMessage("resetScores")
             })
         },
         loadTasks() {

@@ -264,6 +264,8 @@
             
         } else if (action == "showTaskmaster") {
             showDiv("taskmaster")
+        } else if (action == "resetScores") {
+            window.location.reload(true)
         }
     }
 
