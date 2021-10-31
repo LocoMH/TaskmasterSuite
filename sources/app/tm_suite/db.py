@@ -1,37 +1,43 @@
 from tinydb import TinyDB, Query
-from tm_suite import helper
+from . import helper
 import ujson
 
 contestants = TinyDB(helper.find_root() + "/sources/db/contestants.json")
 tasks = TinyDB(helper.find_root() + "/sources/db/tasks.json")
 scores = TinyDB(helper.find_root() + "/sources/db/scores.json")
-special_images = TinyDB(helper.find_root() + "/sources/db/special_images.json")
+general_files = TinyDB(helper.find_root() + "/sources/db/general_files.json")
 
 
-async def add_special_image(name: str, img_source: str):
-    return special_images.insert({
+async def add_general_file(name: str, file_source: str, file_type: str, text: str):
+
+    general_file = {
         "name": name,
-        "img_source": img_source
-    })
+        "file_source": file_source,
+        "file_type": file_type
+    }
+
+    if text != "":
+        general_file["text"] = text
+
+    return general_files.insert(general_file)
 
 
-async def remove_special_image(name: str):
-    special_images.remove(Query().name == name)
+async def remove_general_file(name: str):
+    general_files.remove(Query().name == name)
 
 
 async def get_scores():
     return scores.all()
 
 
-async def get_special_images():
-    return special_images.all()
+async def get_general_files():
+    return general_files.all()
 
 
-async def add_contestant(name: str, img_source: str):
+async def add_contestant(name: str, file_source: str):
     return contestants.insert({
         "name": name,
-        "img_source": img_source,
-        "total_score": 0
+        "file_source": file_source
     })
 
 
@@ -56,9 +62,7 @@ async def get_tasks():
     result = [{
         "id": t.doc_id,
         "name": t["name"],
-        "images": t["images"],
-        "videos": t["videos"],
-        "notes": t["notes"]
+        "files": t["files"]
     } for t in tasks]
     return result
 
@@ -75,27 +79,42 @@ async def get_contestants():
     result = [{
         "id": c.doc_id,
         "name": c["name"],
-        "total_score": c["total_score"],
-        "img_source": c["img_source"],
-        "scores": await get_scores_by_contestant_id(c.doc_id)
+        "file_source": c["file_source"]
     } for c in contestants]
     return result
 
 
-async def add_task(name, images, videos, notes):
+async def get_contestants_with_total_score():
+    result = [{
+        "id": c.doc_id,
+        "name": c["name"],
+        "file_source": c["file_source"],
+        "total_score": await get_total_score(c.doc_id)
+    } for c in contestants]
+    return result
+
+
+async def get_total_score(contestantId):
+    return sum(score["score"] for score in scores.all()
+               if score["contestantId"] == contestantId)
+
+
+async def add_task(name, files):
     return tasks.insert({
         "name": name,
-        "images": images,
-        "videos": videos,
-        "notes": notes
+        "files": files
     })
 
 
-async def update_task(name, images, videos, notes):
+async def update_task(name, files):
     tasks.update({
-        "images": images,
-        "videos": videos,
-        "notes": notes
+        "files": files
+    }, Query().name == name)
+
+
+async def update_note_text(name, text):
+    general_files.update({
+        "text": text
     }, Query().name == name)
 
 
@@ -115,14 +134,6 @@ async def add_score(taskId, contestantId, score):
         "score": score
     }, (Query().taskId == taskId) & (Query().contestantId == contestantId))
 
-    contestants.update({
-        "total_score": sum([score["score"] for score in scores.search(Query().contestantId == contestantId)])
-    }, doc_ids=[contestantId])
-
-
-async def get_total_score(contestantId):
-    return contestants.get(doc_id=contestantId)["total_score"]
-
 
 async def clear_tasks():
     await clear_scores()
@@ -136,4 +147,3 @@ async def clear_contestants():
 
 async def clear_scores():
     scores.truncate()
-    contestants.update({"total_score": 0})

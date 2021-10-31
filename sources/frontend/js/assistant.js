@@ -1,171 +1,248 @@
-
-
-
-var ws = new WebSocket("ws://" + window.location.host + "/ws")
-// $('.custom-switch').bootstrapSwitch()
-
-var scores = []
-var contestants = []
-var tasks = []
-
-function getTasks() {
-    var xhttp = new XMLHttpRequest()
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            tasks = JSON.parse(this.responseText)
-            tasks.sort((a, b) => a.name.localeCompare(b.name))
+new Vue({
+    el: '#app',
+    vuetify: new Vuetify({
+        theme: { dark: true },
+    }),        
+    data() {
+        return {
+            darkMode: true,
+            selectedTask: {
+                id: -1,
+                name: "-",
+                files: []
+            },
+            resetDialog: false,
+            general_files: [],
+            tasks: [],
+            contestants: [],
+            scores: [],
+            internalScores: {},
+            totalScores: {},
+            generalFileDialogs: {},
+            selectedTaskFileDialogs: {},
+            websocket: null,
+            websocketConnected: false,
+            ranks: {},
+            tm: null
         }
-    }
-    xhttp.open("GET", "/data/tasks", false)
-    xhttp.send()
-}
-
-function getContestants() {
-    var xhttp = new XMLHttpRequest()
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            contestants = JSON.parse(this.responseText)
-            contestants.sort((a, b) => a.name.localeCompare(b.name))
+    },
+    filters: {
+        removeExtension(val) {
+            return val.replace(/\.[^/.]+$/, "")
+        },
+        replaceNewLines(val) {
+            return val.replaceAll("\n", "<br>")
         }
-    }
-    xhttp.open("GET", "/data/contestants", false)
-    xhttp.send()
-}
+    },
+    methods: {
+        showImage(image) {
+            this.sendMessage("showImage+++" + image)
+        },
+        resetInternalScores() {
+            for (tIndex in this.tasks) {
+                var task = this.tasks[tIndex]
+                if (!this.internalScores[task.id]) {
+                    this.$set(this.internalScores, task.id, {})
+                }
+                for (cIndex in this.contestants) {
+                    var contestant = this.contestants[cIndex]
+                    if (!this.internalScores[task.id][contestant.id]) {
+                        this.$set(this.internalScores[task.id], contestant.id, 0)
+                    }
+                }
+            }
+            this.updateInternalScores()
+        },
+        updateInternalScores() {
+            this.scores.forEach(score => {
+                if (this.internalScores[score.taskId]) {
+                    this.$set(this.internalScores[score.taskId], score.contestantId, score.score)
+                }
+            })
+            this.updateTotalScore()
+        },
+        updateTotalScore() {
+            this.totalScores = {}
 
-function getSpecialImages() {
-    var xhttp = new XMLHttpRequest()
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            special_images = JSON.parse(this.responseText)
-        }
-    }
-    xhttp.open("GET", "/data/special_images", false)
-    xhttp.send()
-}
+            this.contestants.forEach(contestant => {
+                this.$set(this.totalScores, contestant.id, 0)
+            })
 
-function resetScores() {
-    var xhttp = new XMLHttpRequest()
-    xhttp.onreadystatechange = function() {
-        window.location.reload(true)
-    }
-    xhttp.open("DELETE", "/data/scores", false)
-    xhttp.send()
-}
-
-getSpecialImages()
-getTasks()
-getContestants()
-
-function selectTask(id) {
-    $("#selected-task").text("Selected Task: " + tasks[id - 1].name)
-    $(".task-divs").hide()
-    $("#task-div-" + id).show()
-}
-
-
-function setup() {
-
-    special_images.forEach(img => {
-        if (img.name.toLowerCase() != "taskmaster") {
-            $("#div-basic-controls").append(" ").append('<button class="btn btn-primary special-button" onclick="showImage(event)" data-root="./data/' + img.img_source + '">Show ' + img.name + '</button>')
-        }
-    })
-
-
-    var thead = $('<thead/>').appendTo($("#task-table"))
-    var trow = $('<tr/>').appendTo(thead)
-    $("#task-table").append(thead)
-    var th1 = $("<th>Task</th>")
-    trow.append(th1)
-    var taskTableBody = $("<tbody/>")
-    $("#task-table").append(taskTableBody)
-
-    contestants.forEach(contestant => {
-        trow.append("<th>" + contestant.name + "</th>")
-    })
-
-
-    tasks.forEach(task => {
-        var taskRow = $("<tr/>")
-        taskTableBody.append(taskRow)
-        taskRow.append("<th scope='row'>" + task.name + "<br><button class='btn btn-primary btn-sm' type='button' onclick='selectTask(" + task["id"] + ")'>Media</button></th>")
-
-        contestants.forEach(contestant => {
-            var taskScore = contestant["scores"].find(s => s.taskId == task["id"])
-            if (typeof taskScore === "undefined") {
-                taskScore = 0
+            for (var taskId in this.internalScores) {
+                for (var contestantId in this.internalScores[taskId]) {
+                    this.totalScores[contestantId] += parseFloat(this.internalScores[taskId][contestantId])
+                    this.totalScores[contestantId] = (this.totalScores[contestantId].toFixed(3) * 1)
+                }
+            }
+        },
+        sendMessage(message) {
+            if (this.websocketConnected) {
+                console.log(" sending msg: " + message)
+                this.websocket.send(message)
+            }
+        },
+        resetScores() {
+            this.sendMessage("resetScores")
+            axios.delete('/data/scores')
+            .then(response => { 
+                this.resetDialog = false
+                this.scores = []
+                this.internalScores = {}
+                this.resetInternalScores()
+            })
+        },
+        loadTasks() {
+            axios
+            .get('/data/tasks')
+            .then(response => {
+                if (!_.isEqual(response.data, this.tasks)) {
+                    console.log("Change in tasks detected")
+                    this.tasks = response.data
+                    this.selectTask(this.selectedTask.id)
+                }
+            })
+            .catch(e => {})
+            .then(() => {
+                setTimeout(() => this.loadTasks(), 1000)
+            })
+        },
+        selectTask(taskId) {
+            var newSelectedTask = this.tasks.filter(t => t.id == taskId)
+            if (newSelectedTask.length === 0) {
+                this.selectedTask = {
+                    id: -1,
+                    name: "-",
+                    files: []
+                }
             } else {
-                taskScore = taskScore["score"]
+                this.selectedTask = JSON.parse(JSON.stringify(newSelectedTask[0]))
+                this.selectedTaskFileDialogs = {}
+
+                this.selectedTask.files.forEach(f => { if (f.file_type == "note") { this.$set(this.selectedTaskFileDialogs, f.name, false) }})
             }
-            taskRow.append("<td class='text-center'><input type='number' id='score-" 
-            + task["id"] + "-" + contestant["id"] + "' value='" + taskScore + "' onchange='updateScore(" + task["id"] + ", " + contestant["id"] + ")' style='width: 50px'/><br><span id='buttons-" + task["id"] + "-" + contestant["id"] + "' class='buttons-span'></span></td>")
-            for (var i = 1; i <= contestants.length; i++) {
-                $("#buttons-" + task["id"] + "-" + contestant["id"]).append("<button class='btn btn-outline-primary quick-score-button' style='width: auto' onclick='setScore(" + task["id"] + ", " + contestant["id"] + ", " + i + ")'>" + i + "</button>")
+        },
+        loadContestants() {
+            axios.get("/data/contestants")
+            .then(response => {
+                if (!_.isEqual(response.data, this.contestants)) {
+                    console.log("Change in contestants detected")
+                    this.contestants = response.data
+                }
+            })
+            .catch(e => {})
+            .then(() => {
+                setTimeout(() => this.loadContestants(), 1000)
+            })
+        },
+        loadGeneralFiles() {
+            axios.get("/data/general_files")
+            .then(response => {
+
+                if (!_.isEqual(response.data, this.general_files)) {
+                    console.log("Change in general files detected")
+                    this.general_files = response.data
+                    this.general_files.forEach(f => { if (f.file_type == "note") { this.$set(this.generalFileDialogs, f.name, false) }})
+                }
+            })
+            .catch(e => {})
+            .then(() => {
+                setTimeout(() => this.loadGeneralFiles(), 1000)
+            })
+        },
+        loadScores() {
+            axios.get("/data/scores")
+            .then(response => {
+
+                if (!_.isEqual(response.data, this.scores)) {
+                    console.log("Change in scores detected")
+                    this.scores = response.data
+                }
+            })
+            .catch(e => {})
+            .then(() => {})
+        },
+        connectToWebsocket() {
+            this.websocket = new ReconnectingWebSocket("ws://" + location.hostname + ":8001/ws")
+
+            this.websocket.onopen = () => {
+                console.log('websocket connected')
+                this.websocketConnected = true
             }
-        })
-    })
-
-
-    $('<tfoot><tr id="table-footer"><td>Total</td></tr></tfoot>').appendTo($("#task-table"))
-
-    contestants.forEach(contestant => {
-        $("#table-footer").append("<td id='total-score-" + contestant["id"] + "'>" + contestant["total_score"] + "</td>")
-    })
-
-    tasks.forEach(task => {
-        $("#task-selection").append("<div id='task-div-" + task["id"] + "' class='task-divs'></div>")
-        task.images.forEach(img => {
-            $("#task-div-" + task["id"]).append(" ").append("<image src='./data/tasks/" + task.name + "/" + img + "' data-root='./data/tasks/" + task.name + "/" + img + "' style='width: 192px; height: 108px; cursor: pointer'  class='img-thumbnail' onclick='showImage(event)'></image>")
-        })
-        task.videos.forEach(video => {
-            $("#task-div-" + task["id"]).append(" ").append("<button class='btn btn-primary' onclick='showVideo(event)' data-root='./data/tasks/" + task.name + "/" + video + "'>Video: " + video + "</button>")
-        })
-    })
-    $(".task-divs").hide()
-
-}
-
-function showImage(event) {
-    sendMessage("showImage+++" + event.target.getAttribute("data-root"))
-}
-
-function showVideo(event) {
-    sendMessage("showVideo+++" + event.target.getAttribute("data-root"))
-}
-
-function sendMessage(data) {
-    ws.send(data)
-}
-
-ws.onmessage = function(event) {
-    console.log("received msg: " + event.data)
-}
-
-ws.onopen = function(event) {
-}
-
-function play(event) {
-    sendMessage("play")
-}
-
-function setScore(taskId, playerId, score) {
-    $("#score-" + taskId + "-" + playerId).val(score)
-    updateScore(taskId, playerId)
-}
-
-function updateScore(taskId, playerId) {
-    var score = $("#score-" + taskId + "-" + playerId).val()
-    if (score == "") {
-        $("#score-" + taskId + "-" + playerId).val(0)
-        score = 0
+                
+            this.websocket.onclose = (event) => {
+                console.log('websocket disconnected')
+                this.websocketConnected = false
+            }
+        },
+        ping() {
+            this.sendMessage('__ping__');
+            this.tm = setTimeout(function () {}, 5000)
+        },
+        pong() {
+            clearTimeout(this.tm)
+        },
+        getScore(taskId, contestantId) {
+            var filteredScores = this.scores.filter(s => (s.taskId == taskId) && (s.contestantId == contestantId))
+            var score = 0
+            if (filteredScores.length != 0) {
+                score = filteredScores[0].score
+            }
+            return score
+        },
+        setScore(taskId, contestantId, score) {
+            this.internalScores[taskId][contestantId] = score
+            this.updateScore(taskId, contestantId)
+        },
+        updateScore(taskId, contestantId) {
+            var score = this.internalScores[taskId][contestantId]
+            if (score !== '') {
+                this.updateTotalScore()
+                this.sendMessage("setScore+++" + taskId + "+++" + contestantId + "+++" + score + "+++" + this.totalScores[contestantId])
+            }                    
+        },
+        closeGeneralFileDialog(filename) {
+            this.$set(this.generalFileDialogs, filename, false)
+        },
+        closeSelectedTaskFileDialog(filename) {
+            this.$set(this.selectedTaskFileDialogs, filename, false)
+        }
+    },
+    beforeMount() {
+        this.loadTasks()
+        this.loadContestants()
+        this.loadGeneralFiles()
+        this.loadScores()
+        this.connectToWebsocket()
+    },
+    watch: {
+        darkMode(val) {
+            this.$vuetify.theme.dark = val
+        },
+        tasks() {            
+            this.resetInternalScores()
+        },
+        contestants() {            
+            this.resetInternalScores()
+        },
+        scores() {
+            this.resetInternalScores()
+        }
+    },
+    computed: {
+        filteredGeneralFiles() {
+            return this.general_files.filter(file => file.name.toLowerCase() != "taskmaster")
+        },
+        sortedGeneralFiles() {
+            var result = [...this.filteredGeneralFiles]
+            return result.sort((a, b) => a.name.localeCompare(b.name))
+        },
+        sortedTasks() {
+            var result = [...this.tasks]
+            return result.sort((a, b) => a.name.localeCompare(b.name))
+        },
+        sortedContestants() {
+            var result = [...this.contestants]
+            return result.sort((a, b) => a.name.localeCompare(b.name))
+        }
     }
-    var newScore = 0
-    tasks.forEach(task => {
-        newScore += parseFloat(document.getElementById("score-" + task["id"] + "-" + (playerId)).value)
-    })
-    scores[playerId - 1] = newScore
-    document.getElementById("total-score-" + playerId).innerText = newScore
-    sendMessage("setScore+++" + taskId + "+++" + playerId + "+++" + score + "+++" + newScore)
-}
-
-setup()
+})

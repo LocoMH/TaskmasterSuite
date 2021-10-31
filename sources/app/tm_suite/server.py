@@ -34,8 +34,6 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 app.mount("/home/", StaticFiles(directory=helper.find_root()), name="static")
-app.mount("/exp/", StaticFiles(directory=helper.find_root() +
-          "/sources/frontend_vue"), name="static")
 
 
 @app.get("/data/contestants")
@@ -43,14 +41,19 @@ async def get_contestants():
     return await db.get_contestants()
 
 
+@app.get("/data/contestants_with_total_score")
+async def get_contestants():
+    return await db.get_contestants_with_total_score()
+
+
 @app.get("/data/tasks")
 async def get_tasks():
     return await db.get_tasks()
 
 
-@app.get("/data/special_images")
-async def get_special_images():
-    return await db.get_special_images()
+@app.get("/data/general_files")
+async def get_general_files():
+    return await db.get_general_files()
 
 
 @app.get("/data/scores")

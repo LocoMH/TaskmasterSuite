@@ -192,33 +192,33 @@
                 contestants.sort((a, b) => a.name.localeCompare(b.name))
                 contestants.sort((a, b) => b["total_score"] - a["total_score"])
                 contestants.forEach(contestant => {
-                    addContestant("./data/contestants/" + contestant["img_source"], contestant["id"], contestant["total_score"])
+                    addContestant("./data/contestants/" + contestant["file_source"], contestant["id"], contestant["total_score"])
                 })
             
                 refreshContestants()
             }
         }
-        xhttp.open("GET", "/data/contestants", false)
+        xhttp.open("GET", "/data/contestants_with_total_score", false)
         xhttp.send()
     }
 
-    function getSpecialImages() {
+    function getGeneralFiles() {
         var xhttp = new XMLHttpRequest()
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                special_images = JSON.parse(this.responseText)
+                general_files = JSON.parse(this.responseText)
             }
         }
-        xhttp.open("GET", "/data/special_images", false)
+        xhttp.open("GET", "/data/general_files", false)
         xhttp.send()
     }
     
     getContestants()
-    getSpecialImages()
+    getGeneralFiles()
 
-    document.querySelector("#image-taskmaster").src = "./data/" + special_images.find(img => {
-        return img.name.toLowerCase() == "taskmaster"
-    }).img_source
+    document.querySelector("#image-taskmaster").src = "./data/" + general_files.find(file => {
+        return file.name.toLowerCase() == "taskmaster"
+    }).file_source
 
     function showDiv(name) {
         document.querySelector("#div-" + name).style.display = "block"
@@ -232,7 +232,7 @@
         }
     }
 
-    var ws = new WebSocket("ws://" + window.location.host + "/ws")
+    var ws = new ReconnectingWebSocket("ws://" + window.location.host + "/ws")
     ws.onmessage = function(event) {
         console.log("received msg '" + event.data + "'")
         var content = event.data.split("+++")

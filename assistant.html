@@ -1,89 +1,457 @@
-<!doctype html>
-<html lang="en">
-    <head>
-		<link rel="shortcut icon" href="./sources/frontend/tm.ico">
-        <title>Taskmaster Suite - Controller</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-		<link href="./sources/frontend/css/assistant.css" rel="stylesheet" type="text/css">
-    </head>
-    <body style="width: 100%">
-        <div class="container-fluid" style="width: 100%">
-            <div class="">
-                <header>
-                    <div class="">
-                        <div class="row">
-                            <div class="col">
-                                <h1>Taskmaster Controller</h1>
-                            </div>
-                            <div class="col-auto" style="margin-top: 10px; margin-bottom: 10px;">
-                                <!-- Button trigger modal -->
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                    Reset all scores    
-                                </button>
-                                
-                                <!-- Modal -->
-                                <div class="modal fade" id="staticBackdrop" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                        <h5 class="modal-title" id="staticBackdropLabel">Reset all scores</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            Are you sure you want to reset all scores to 0?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="button" class="btn btn-primary" onclick="resetScores()" data-bs-dismiss="modal">Reset</button>
-                                        </div>
-                                    </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="border-bottom: 1px solid black;">
-                    </div>
-                    <div style="margin-top: 10px; margin-bottom: 10px; border-bottom: 1px solid black;">
-                        <div style="float: left; margin-right: 5px; margin-top: 5px">
-                            <h5>Basic Controls</h5>
-                        </div>
-                        <div id="div-basic-controls">
-                            <button id="btn-show-taskmaster" onclick="sendMessage('showTaskmaster')" class="btn btn-primary special-button" type="button">Show Taskmaster</button>
-                            <button id="btn-show-scoreboard" onclick="sendMessage('showScoreboard')" class="btn btn-primary special-button" type="button">Show Scoreboard</button>
-                            <button id="btn-update" onclick="sendMessage('play')" class="btn btn-primary special-button" type="button">Update Scoreboard</button>
-                        </div>
-                    </div>
-                    <div>
-                        <h5 style="float: left;">Scores</h5>
-                        <div class="custom-control custom-switch" style="float: right">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="switch-score-buttons" onchange="$('.quick-score-button').toggle()" checked>
-                                <label class="form-check-label" for="switch-score-buttons">Show quick score buttons</label>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-                <div class="">
-                    <div class="table-scroll">
-                        <table id="task-table" class="table main-table">
-                        </table>
-                    </div>
-                </div>
-                <footer style="min-height: 200px; margin-top: 10px; padding-top: 5px; border-top: 1px solid black">
-                    <h5 id="selected-task">
-                        Selected Task: -
-                    </h5>
-                    <div id="task-selection">
-                        
-                    </div>
-                </footer>
-            </div>
-        </div>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="./sources/frontend/js/assistant.js" type="text/javascript"></script>
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.min.js"></script> -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    </body>
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <link href="./sources/frontend/fonts/veteran_typewriter.css" rel="stylesheet" type="text/css">
+    <link rel="shortcut icon" href="./sources/frontend/tm.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+    <div id="app">
+        <v-app dark>
+                <v-app-bar app style="font-family: 'veteran_typewriterregular', sans-serif; font-size: 150%;">
+                    <v-avatar
+                        size="30"
+                        :color="websocketConnected ? 'success' : 'error'"
+                    >
+                        <v-icon v-if="websocketConnected">mdi-check</v-icon>
+                        <v-icon v-else>mdi-close</v-icon>
+                    </v-avatar>
+                    <v-spacer></v-spacer>
+                    <img class="mr-3" src="./sources/frontend/icon.png" width="50">
+                        <h3 class="font-weight-regular">
+                            Taskmaster Suite
+                        </h3>
+                    <v-spacer></v-spacer>
+                    <v-switch
+                        v-model="darkMode"
+                        dense
+                        hide-details
+                    >
+                        <template v-slot:label>
+                            <v-icon>mdi-moon-waxing-crescent</v-icon>
+                        </template>
+                    </v-switch>
+                </v-app-bar>
+                <v-main>
+                    <!-- <v-btn color="success" @click="loadContestants">Reload Contestants</v-btn>
+                    <v-btn color="success" @click="loadTasks">Reload Tasks</v-btn>
+                    <v-btn color="success" @click="loadScores">Reload Scores</v-btn>
+                    <v-btn color="success" @click="loadGeneralFiles">Reload General Files</v-btn> -->
+                    <v-container fluid>
+                        <h3>
+                            Basic Controls
+                        </h3>
+                        <v-btn class="ma-1" color="primary" @click="sendMessage('showTaskmaster')">Show Taskmaster</v-btn>
+                        <v-btn class="ma-1" color="primary" @click="sendMessage('showScoreboard')">Show Scoreboard</v-btn>
+                        <v-btn class="ma-1" color="primary" @click="sendMessage('play')">Update Scoreboard</v-btn>
+                    </v-container>
+                    <v-divider></v-divider>
+                    <v-container fluid>
+                        <h3>
+                            General files
+                        </h3>
+                        <v-layout row wrap class="mt-1">
+                            <v-card
+                                class="ma-2" 
+                                v-for="file in sortedGeneralFiles" 
+                                :key="file.file_source" 
+                                max-width="140"
+                            >
+                                <v-img
+                                    v-if="file.file_type == 'image'"
+                                    :src="'/home/data/' + file.file_source"
+                                    height="79"
+                                    width="140"
+                                    class="grey darken-4"
+                                    style="cursor: pointer"
+                                    @click="sendMessage('showImage+++./data/' + file.file_source)"
+                                ></v-img>
+                                <v-card 
+                                    v-else
+                                >
+                                    <v-dialog
+                                        v-if="file.file_type == 'note'"
+                                        v-model="generalFileDialogs[file.name]"
+                                        min-width="400"
+                                        max-width="700"
+                                        overlay-opacity="0.8"
+                                    >
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-btn
+                                                color="primary"
+                                                v-bind="attrs"
+                                                v-on="on"
+                                                width="140"
+                                                height="79"
+                                                large
+                                                block 
+                                            >
+                                                Open Note
+                                                <v-icon right>mdi-note-text</v-icon>
+                                            </v-btn>
+                                        </template>
+                                    
+                                        <v-card>
+                                            <v-card-title>
+                                                Note: {{ file.file_source }}
+                                            </v-card-title>
+                                            <v-divider></v-divider>
+                                            <v-card-text class="mt-4">
+                                                <span :inner-html.prop="file.text | replaceNewLines"></span>
+                                            </v-card-text>
+                                            <v-divider></v-divider>
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn
+                                                color="secondary"
+                                                @click="closeGeneralFileDialog(file.name)"
+                                                >
+                                                    Close
+                                                </v-btn>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-dialog>
+                                    <v-btn 
+                                        v-if="file.file_type == 'video'"
+                                        color="primary"
+                                        width="140"
+                                        height="79"
+                                        large
+                                        block 
+                                        @click="sendMessage('showVideo+++./data/' + file.file_source)"
+                                    >
+                                        Play Video
+                                        <v-icon right>mdi-video-vintage</v-icon>
+                                    </v-btn>
+                                </v-card>
+                                <v-card-actions style="max-height: 50px; min-height: 50px; height: 50px;">
+                                    <v-spacer></v-spacer>
+                                    <div class="text-caption">{{ file.file_source }}</div>
+                                    <v-spacer></v-spacer>
+                                </v-card-actions>
+                            </v-card>
+                        </v-layout>
+                    </v-container>
+                    <v-divider></v-divider>
+                    <v-container fluid>
+                        <v-layout row class="ma-1">
+
+                            <h3>
+                                Scores
+                            </h3>
+                            <v-spacer></v-spacer>
+                            <v-dialog
+                                v-model="resetDialog"
+                                width="500"
+                                overlay-opacity="0.8"
+                            >
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                        color="primary"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                        small
+                                    >
+                                        Reset all scores
+                                    </v-btn>
+                                </template>
+                            
+                                <v-card>
+                                    <v-card-title>
+                                        Reset all scores
+                                    </v-card-title>
+                                    <v-divider></v-divider>
+                                    <v-card-text class="mt-4">
+                                        Are you sure you want to reset all scores to 0?
+                                    </v-card-text>
+                                    <v-divider></v-divider>
+                                    <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-btn
+                                            color="secondary"
+                                            @click="resetDialog = false"
+                                        >
+                                            Cancel
+                                        </v-btn>
+                                        <v-btn
+                                            color="primary"
+                                            @click="resetScores()"
+                                        >
+                                            Confirm
+                                        </v-btn>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-dialog>
+                        </v-layout>
+                        <v-simple-table
+                            fixed-header
+                            height="300"
+                        >
+                            <template v-slot:default>
+                                <thead>
+                                    <tr style="height: 100px">
+                                        <th class="text-left">
+                                            Task
+                                        </th>
+                                        <th v-for="item in sortedContestants" :key="item.name">
+                                            {{ item.name }}
+                                            <br>
+                                            Score: 
+                                            <v-chip
+                                                left
+                                                class="pa-2"
+                                                color="primary"
+                                                small
+                                            >
+                                                {{ totalScores[item.id] }}
+                                            </v-chip> 
+                                            <!-- Rank:
+                                            <v-chip
+                                                left
+                                                class="green pa-2"
+                                                small
+                                            >
+                                                4
+                                            </v-chip> -->
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="(task, tIndex) in sortedTasks"
+                                        :key="task.id"
+                                    > 
+                                        <td>
+                                            <v-btn small color="primary" @click="selectTask(task.id)">
+                                                {{ task.name }}
+                                            </v-btn>
+                                        </td>
+                                        <td v-for="(contestant, cIndex) in sortedContestants" :key="contestant.id">
+                                            <v-row no-gutters style="width: 100px;">
+                                                <v-col>
+                                                    <v-text-field
+                                                        hide-details
+                                                        solo
+                                                        light
+                                                        height="40px"
+                                                        type="number"
+                                                        v-model="internalScores[task.id][contestant.id]"
+                                                        @input="updateScore(task.id, contestant.id)"
+                                                        style="min-width: 60px; max-width: 60px; border-top-right-radius: 0; border-bottom-right-radius: 0;"
+                                                        dense
+                                                    ></v-text-field>
+                                                </v-col>
+                                                <v-col>
+                                                    <v-menu
+                                                        bottom
+                                                        left
+                                                        offset-y
+                                                        close-on-content-click
+                                                    >
+                                                    <template v-slot:activator="{ on, attrs }">
+                                                        <v-btn 
+                                                            height="40px" 
+                                                            color="primary" 
+                                                            min-width="0" 
+                                                            width="20" 
+                                                            style="border-top-left-radius: 0; border-bottom-left-radius: 0;"
+                                                            v-bind="attrs"
+                                                            v-on="on"
+                                                            >
+                                                            <v-icon>
+                                                                mdi-numeric
+                                                            </v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <v-card color="grey" class="pa-2">
+                                                        <v-row dense>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '0')">0</v-btn>
+                                                            </v-col>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '1')">1</v-btn>
+                                                            </v-col>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '2')">2</v-btn>
+                                                            </v-col>
+                                                        </v-row>
+                                                        <v-row dense>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '3')">3</v-btn>
+                                                            </v-col>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '4')">4</v-btn>
+                                                            </v-col>
+                                                            <v-col>
+                                                                <v-btn color="primary" min-width="0" max-width="20" width="20" @click="setScore(task.id, contestant.id, '5')">5</v-btn>
+                                                            </v-col>
+                                                        </v-row>
+                                                    </v-card>
+                                                </v-menu>
+                                            </v-col>
+                                            <v-spacer></v-spacer>
+                                            </v-row>
+                                            <!-- for (var i = 1; i <= contestants.length; i++) {
+                                                $("#buttons-" + task["id"] + "-" + contestant["id"]).append("<button class='btn btn-outline-primary quick-score-button' style='width: auto' onclick='setScore(" + task["id"] + ", " + contestant["id"] + ", " + i + ")'>" + i + "</button>")
+                                            } -->
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </template>
+                        </v-simple-table>
+                    </v-container>
+                    <v-divider></v-divider>
+                    <v-container fluid>
+                        <h3>
+                            Task files for: {{ selectedTask.name }}
+                        </h3>
+                        <v-layout row wrap class="mt-1">
+                            <v-card
+                                class="ma-2" 
+                                v-for="file in selectedTask.files" 
+                                :key="file.file_source" 
+                                max-width="140"
+                            >
+                                <v-img
+                                    v-if="file.file_type == 'image'"
+                                    :src="'/home/data/tasks/' + selectedTask.name + '/' + file.file_source"
+                                    height="79"
+                                    width="140"
+                                    class="grey darken-4"
+                                    style="cursor: pointer"
+                                    @click="sendMessage('showImage+++./data/tasks/' + selectedTask.name + '/' + file.file_source)"
+                                ></v-img>
+                                <v-card 
+                                    v-else
+                                >
+                                    <v-dialog
+                                        v-if="file.file_type == 'note'"
+                                        v-model="selectedTaskFileDialogs[file.name]"
+                                        min-width="400"
+                                        max-width="700"
+                                        overlay-opacity="0.8"
+                                    >
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-btn
+                                                color="primary"
+                                                v-bind="attrs"
+                                                v-on="on"
+                                                width="140"
+                                                height="79"
+                                                large
+                                                block 
+                                            >
+                                                Open Note
+                                                <v-icon right>mdi-note-text</v-icon>
+                                            </v-btn>
+                                        </template>
+                                    
+                                        <v-card>
+                                            <v-card-title>
+                                                Note: {{ file.file_source }}
+                                            </v-card-title>
+                                            <v-divider></v-divider>
+                                            <v-card-text class="mt-4">
+                                                <span :inner-html.prop="file.text | replaceNewLines"></span>
+                                            </v-card-text>
+                                            <v-divider></v-divider>
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn
+                                                    color="secondary"
+                                                    @click="closeSelectedTaskFileDialog(file.name)"
+                                                >
+                                                    Close
+                                                </v-btn>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-dialog>
+                                    <v-btn 
+                                        v-if="file.file_type == 'video'"
+                                        color="primary"
+                                        width="140"
+                                        height="79"
+                                        large
+                                        block 
+                                        @click="sendMessage('showVideo+++./data/tasks/' + selectedTask.name + '/' + file.file_source)"
+                                    >
+                                        Play Video
+                                        <v-icon right>mdi-video-vintage</v-icon>
+                                    </v-btn>
+                                </v-card>
+                                <v-card-actions style="max-height: 50px; min-height: 50px; height: 50px;">
+                                    <v-spacer></v-spacer>
+                                    <div class="text-caption">{{ file.file_source }}</div>
+                                    <v-spacer></v-spacer>
+                                </v-card-actions>
+                            </v-card>
+                        <!-- </v-layout>
+                            <v-card class="ma-2" v-for="note in selectedTask.notes" :key="note.file" max-width="140">
+                                <v-card
+                                    height="50"
+                                    width="140"
+                                    class="justify-center d-flex align-center"
+                                >
+                                <v-dialog
+                                    v-model="note.dialog"
+                                    min-width="400"
+                                    max-width="700"
+                                    overlay-opacity="0.8"
+                                >
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn
+                                            color="primary"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            block
+                                            large
+                                        >
+                                            Open Note
+                                        </v-btn>
+                                    </template>
+                                
+                                    <v-card>
+                                        <v-card-title>
+                                            Note: {{ note.file }}
+                                        </v-card-title>
+                                        <v-divider></v-divider>
+                                        <v-card-text class="mt-4">
+                                            <span :inner-html.prop="note.text | replaceNewLines"></span>
+                                        </v-card-text>
+                                        <v-divider></v-divider>
+                                        <v-card-actions>
+                                            <v-spacer></v-spacer>
+                                            <v-btn
+                                                color="secondary"
+                                                @click="note.dialog = false"
+                                            >
+                                                Close
+                                            </v-btn>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-dialog>
+                            </v-card>
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                    <div class="text-caption">{{ note.file }}</div>
+                                    <v-spacer></v-spacer>
+                                </v-card-actions>
+                            </v-card> -->
+                        </v-layout>
+                    </v-container>
+            </v-main>
+        </v-app>
+    </div>
+    <script src="./sources/frontend/js/reconnecting-websocket.min.js"></script>
+    <script src="./sources/frontend/js/assistant.js"></script>
+</body>
 </html>
