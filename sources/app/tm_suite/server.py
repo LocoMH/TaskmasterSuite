@@ -5,9 +5,9 @@ from fastapi.staticfiles import StaticFiles
 from starlette.websockets import WebSocketDisconnect
 import uvicorn
 import multiprocessing
-from .loader import generate_files
-from . import helper
-from . import db
+from tm_suite.loader import generate_files
+from tm_suite import helper
+from tm_suite import db
 import easygui
 import ujson
 import asyncio
