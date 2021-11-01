@@ -3,12 +3,12 @@ Nice to see you, yes it is! Welcome to the Taskmaster Suite project, a fun littl
 
 ## Quickstart
 All you need to do is
-- have a Windows computer (exception: you are capable of running a python application yourself in which case you can check out the section `Mac and Linux support` below),
+- have a Windows computer (exception: you are capable of running a python application yourself in which case you can check out the section [`Mac and Linux support`](https://github.com/LocoMH/TaskmasterSuite#mac-and-linux-support) below),
 - download the files from the [latest release](https://github.com/LocoMH/TaskmasterSuite/releases/latest),
 - extract the downloaded files to an arbitrary location on your computer and finally
 - run `server.exe`. The next steps will be displayed in a window which opens. There are two websites: The assistant screen and the audience screen. The assistant screen controls the audience screen. That's really all.
 
-Note that this application was tested on Windows 10 and an up-to-date version of Chrome browser. There are no known incompatibility issues, though the older a browser/operating system is, the less likely it is to run smoothly.
+Note that this application was tested on Windows 10 and an up-to-date version of Chrome browser. There are no known incompatibility issues, though the older a browser/operating system is, the less likely it is to run smoothly. Make sure to check out the [`FAQs below`](https://github.com/LocoMH/TaskmasterSuite#faqs) first before filing an issue.
 
 ## Description of assistant screen
 - Top left corner: This is either a red cross or a green check mark, letting you know whether the website is connected to the server which you are running (`server.exe`).
@@ -18,9 +18,9 @@ Note that this application was tested on Windows 10 and an up-to-date version of
   - Show scoreboard: Will show the scoreboard with all contestants and their current scores
   - Update scoreboard: Having distributed the scores, the assistant can click this button and the contestants get their scores updated on the audience screen and switch places
   - Stop all sounds: In case any sound is playing, it is stopped using this button
-- Section `General files`: Any files which you have placed into the `data` directory. More information on how to set the files can be found below in the section `Alter files`.
+- Section `General files`: Any files which you have placed into the `data` directory. More information on how to set the files can be found below in the section [`Alter files`](https://github.com/LocoMH/TaskmasterSuite#alter-files).
 - Section `Scores`: Table with tasks and contestants and the respective scores.
-- Section `Task files for:`: Any files which are related to a specific task. Choose the task by clicking on the button in the table above. More information on how to set the files can be found below in the section `Alter files`.
+- Section `Task files for:`: Any files which are related to a specific task. Choose the task by clicking on the button in the table above. More information on how to set the files can be found below in the section [`Alter files`](https://github.com/LocoMH/TaskmasterSuite#alter-files).
 
 ## Alter files
 ### Backgrounds, seal, frames
