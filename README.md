@@ -3,7 +3,7 @@ Nice to see you, yes it is! Welcome to the Taskmaster Suite project, a fun littl
 
 ## Quickstart
 All you need to do is
-- have a Windows computer (exception: you are capable of running a python application yourself),
+- have a Windows computer (exception: you are capable of running a python application yourself in which case you can check out the section `Mac and Linux support` below),
 - download the files from the [latest release](https://github.com/LocoMH/TaskmasterSuite/releases/latest),
 - extract the downloaded files to an arbitrary location on your computer and finally
 - run `server.exe`. The next steps will be displayed in a window which opens. There are two websites: The assistant screen and the audience screen. The assistant screen controls the audience screen. That's really all.
@@ -81,6 +81,6 @@ to start the application.
 > 
 > A: The easiest way will be to register the potential issue right here and describe it as precisely as possible: https://github.com/LocoMH/TaskmasterSuite/issues/new. Thanks!
 
-> Q: I have an idea for a cool new feature, how can I let yu know?
+> Q: I have an idea for a cool new feature, how can I let you know?
 > 
 > A: Just like for bugs, please register the idea here and describe it as precisely as possible: https://github.com/LocoMH/TaskmasterSuite/issues/new. Thanks!
