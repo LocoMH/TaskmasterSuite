@@ -32,6 +32,13 @@ Note that this application was tested on Windows 10 and an up-to-date version of
 13. Section `Task files for: <Task name>`: Any files which are related to a specific task. Choose the task by clicking on the button in the table above. More information on how to set the files can be found below in the section [`Alter files`](#alter-files).
 
 ## Alter files
+You can change almost anything to make the application show the images and videos that you want. The only time you ever need to reload the audience website is after you've changed any of the following:
+- Background image,
+- the seal image,
+- a frame image,
+- the taskmaster image or
+- contestants.
+
 ### Backgrounds, seal, frames
 Go to `data/backgrounds` and replace the images to your likings. Note that the names **must** be identical to the initial names (i.e. also the file types must be identical at this point).
 
