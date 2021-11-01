@@ -232,6 +232,17 @@
         }
     }
 
+    var audio = null
+
+    function playSound(file) {
+        if (audio) {
+            audio.pause()
+        }
+        audio = new Audio(file)
+        audio.play()
+        console.log(audio)
+    }
+
     var ws = new ReconnectingWebSocket("ws://" + window.location.host + "/ws")
     ws.onmessage = function(event) {
         console.log("received msg '" + event.data + "'")
@@ -254,6 +265,10 @@
             document.querySelector("#video").currentTime = 0
             document.querySelector("#video").play()
 
+            if (audio) {
+                audio.pause()
+            }
+
             document.getElementById('video').addEventListener('ended', function(e) {
                 showDiv("taskmaster")
             }, false)
@@ -266,6 +281,12 @@
             showDiv("taskmaster")
         } else if (action == "resetScores") {
             window.location.reload(true)
+        } else if (action == "playSound") {
+            playSound(content[1])
+        } else if (action == "stopSound") {
+            if (audio) {
+                audio.pause()
+            }
         }
     }
 

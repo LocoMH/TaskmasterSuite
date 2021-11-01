@@ -7,3 +7,4 @@ starlette==0.16.0
 tinydb==4.5.2
 ujson==4.2.0
 uvicorn==0.15.0
+websockets==10.0

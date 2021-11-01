@@ -55,7 +55,7 @@ async def check_for_tasks(root: str):
             "name": file.rsplit(".", 1)[0],
             "file_source": file,
             "file_type": get_file_type(file)
-        } for file in os.listdir(root + "/data/tasks/" + task) if file.endswith(ALLOWED_IMG_EXTENSIONS + ALLOWED_VID_EXTENSIONS + ALLOWED_TXT_EXTENSIONS)]
+        } for file in os.listdir(root + "/data/tasks/" + task) if file.endswith(ALL_ALLOWED_EXTENSIONS)]
     } for task in files]
 
     for task in newTasks:
@@ -80,7 +80,7 @@ async def check_for_tasks(root: str):
 
 async def check_for_general_files(root: str):
     files = [f for f in os.listdir(
-        root + "/data") if f.endswith(ALLOWED_IMG_EXTENSIONS + ALLOWED_VID_EXTENSIONS + ALLOWED_TXT_EXTENSIONS)]
+        root + "/data") if f.endswith(ALL_ALLOWED_EXTENSIONS)]
 
     newGeneralFiles = [{
         "name": file.rsplit(".", 1)[0],

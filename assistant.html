@@ -55,6 +55,7 @@
                         <v-btn class="ma-1" color="primary" @click="sendMessage('showTaskmaster')">Show Taskmaster</v-btn>
                         <v-btn class="ma-1" color="primary" @click="sendMessage('showScoreboard')">Show Scoreboard</v-btn>
                         <v-btn class="ma-1" color="primary" @click="sendMessage('play')">Update Scoreboard</v-btn>
+                        <v-btn class="ma-1" color="primary" @click="sendMessage('stopSound')">Stop all sounds</v-btn>
                     </v-container>
                     <v-divider></v-divider>
                     <v-container fluid>
@@ -133,6 +134,18 @@
                                     >
                                         Play Video
                                         <v-icon right>mdi-video-vintage</v-icon>
+                                    </v-btn>
+                                    <v-btn 
+                                        v-if="file.file_type == 'sound'"
+                                        color="primary"
+                                        width="140"
+                                        height="79"
+                                        large
+                                        block 
+                                        @click="sendMessage('playSound+++./data/' + file.file_source)"
+                                    >
+                                        Play Sound
+                                        <v-icon right>mdi-music</v-icon>
                                     </v-btn>
                                 </v-card>
                                 <v-card-actions style="max-height: 50px; min-height: 50px; height: 50px;">
@@ -388,6 +401,18 @@
                                     >
                                         Play Video
                                         <v-icon right>mdi-video-vintage</v-icon>
+                                    </v-btn>
+                                    <v-btn 
+                                        v-if="file.file_type == 'sound'"
+                                        color="primary"
+                                        width="140"
+                                        height="79"
+                                        large
+                                        block 
+                                        @click="sendMessage('playSound+++./data/' + file.file_source)"
+                                    >
+                                        Play Sound
+                                        <v-icon right>mdi-music</v-icon>
                                     </v-btn>
                                 </v-card>
                                 <v-card-actions style="max-height: 50px; min-height: 50px; height: 50px;">
