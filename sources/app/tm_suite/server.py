@@ -93,8 +93,8 @@ async def start_file_generation():
 
 
 def show_window():
-    easygui.msgbox("The Taskmaster Suite was succesfully launched!\n\nConnect to\n\nhttp://" + helper.get_ip() + ":8001/home/screen.html\n\nand\n\nhttp://" + helper.get_ip() +
-                   ":8001/home/assistant.html\n\non any computer in your network in order to use the application.\n\nNote that closing this window does not stop the application. Closing the command prompt window does.", "Successfully started")
+    easygui.msgbox("The Taskmaster Suite was succesfully launched!\n\nTo use the application, open a browser.\n\nFor the audience screen, open this website:\n\nhttp://" + helper.get_ip() + ":8001/home/screen.html\n\nFor the assistant screen, open this website:\n\nhttp://" + helper.get_ip() +
+                   ":8001/home/assistant.html\n\nYou can open the websites on any device (including Android/iOS) in your private WiFi network in order to use the application.\n\nNote that closing this window does not stop the application. Closing the black command prompt window does.", "Successfully started")
 
 
 @app.on_event("startup")
