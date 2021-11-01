@@ -2,25 +2,34 @@
 Nice to see you, yes it is! Welcome to the Taskmaster Suite project, a fun little private project which shall allow you to control a screen for an audience using a controller website, much like Alex Horne and his international counterparts are doing it on the famous TV show Taskmaster.
 
 ## Quickstart
-All you need to do is
-- have a Windows computer (exception: you are capable of running a python application yourself in which case you can check out the section [`Mac and Linux support`](https://github.com/LocoMH/TaskmasterSuite#mac-and-linux-support) below),
-- download the files from the [latest release](https://github.com/LocoMH/TaskmasterSuite/releases/latest),
-- extract the downloaded files to an arbitrary location on your computer and finally
-- run `server.exe`. The next steps will be displayed in a window which opens. There are two websites: The assistant screen and the audience screen. The assistant screen controls the audience screen. That's really all.
+All you need is
+- a Windows computer (exception: you are capable of running a python application yourself in which case you can check out the section [`Mac and Linux support`](#mac-and-linux-support) below),
+- to download the files from the [latest release](releases/latest),
+- to extract the downloaded files to an arbitrary location on your computer and finally
+- to run `server.exe`. The next steps will be displayed in this window:
 
-Note that this application was tested on Windows 10 and an up-to-date version of Chrome browser. There are no known incompatibility issues, though the older a browser/operating system is, the less likely it is to run smoothly. Make sure to check out the [`FAQs below`](https://github.com/LocoMH/TaskmasterSuite#faqs) first before filing an issue.
+![Start window](sources/readme/start_window.png)
+
+There are two websites: The assistant screen and the audience screen. The assistant screen controls the audience screen. That's really all.
+
+Note that this application was tested on Windows 10 and an up-to-date version of Chrome browser. There are no known incompatibility issues, though the older a browser/operating system is, the less likely it is to run smoothly. Make sure to check out the [`FAQs`](#faqs) below first before filing an issue.
 
 ## Description of assistant screen
-- Top left corner: This is either a red cross or a green check mark, letting you know whether the website is connected to the server which you are running (`server.exe`).
-- Top right corner: Change between light and dark mode here.
-- Section `Basic controls`: As of now, there are four options:
-  - Show taskmaster: Will show the taskmaster image on the audience screen (the one which is shown when you open the audience screen the first time)
-  - Show scoreboard: Will show the scoreboard with all contestants and their current scores
-  - Update scoreboard: Having distributed the scores, the assistant can click this button and the contestants get their scores updated on the audience screen and switch places
-  - Stop all sounds: In case any sound is playing, it is stopped using this button
-- Section `General files`: Any files which you have placed into the `data` directory. More information on how to set the files can be found below in the section [`Alter files`](https://github.com/LocoMH/TaskmasterSuite#alter-files).
-- Section `Scores`: Table with tasks and contestants and the respective scores.
-- Section `Task files for:`: Any files which are related to a specific task. Choose the task by clicking on the button in the table above. More information on how to set the files can be found below in the section [`Alter files`](https://github.com/LocoMH/TaskmasterSuite#alter-files).
+![Assistant screen](sources/readme/assistant_screen.png)
+
+1. This is either a red cross or a green check mark, letting you know whether the website is connected to the server which you are running (`server.exe`).
+2. Top right corner: Change between light and dark mode here.
+3. Section `Basic controls`: As of now, there are four buttons here (points 4.-8.).
+4. Show taskmaster: Will show the taskmaster image on the audience screen (the one which is shown when you open the audience screen the first time).
+5. Show scoreboard: Will show the scoreboard with all contestants and their current scores.
+6. Update scoreboard: Having distributed the scores, the assistant can click this button and the contestants get their scores updated on the audience screen and switch places.
+7. Stop all sounds: In case any sound is playing, it is stopped using this button.
+8. Section `General files`: Any files which you have placed into the `data` directory. More information on how to set the files can be found below in the section [`Alter files`](#alter-files).
+9. Section `Scores`: Table with tasks and contestants and the respective scores.
+10. Reset all scores: Will set all scores to 0 after reconfirmation.
+11. All tasks are listed in the table vertically. Clicking on them will open the task in the section `Task files for: <Task name>` (see point 13).
+12. All contestants are listed in the table horizontally. You can also see the total score (sum of all task scores) for each contestant.
+13. Section `Task files for: <Task name>`: Any files which are related to a specific task. Choose the task by clicking on the button in the table above. More information on how to set the files can be found below in the section [`Alter files`](#alter-files).
 
 ## Alter files
 ### Backgrounds, seal, frames
