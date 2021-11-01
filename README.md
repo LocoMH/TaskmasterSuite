@@ -4,7 +4,7 @@ Nice to see you, yes it is! Welcome to the Taskmaster Suite project, a fun littl
 ## Quickstart
 All you need is
 - a Windows computer (exception: you are capable of running a python application yourself in which case you can check out the section [`Mac and Linux support`](#mac-and-linux-support) below),
-- to download the files from the [latest release](releases/latest),
+- to download the files from the [latest release](https://github.com/LocoMH/TaskmasterSuite/releases/latest),
 - to extract the downloaded files to an arbitrary location on your computer and finally
 - to run `server.exe`. The next steps will be displayed in this window:
 
