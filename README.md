@@ -67,7 +67,7 @@ The same as for `Images (general)` and `Images (task-related)` applies. The only
 The same as for `Images (general)` and `Images (task-related)` applies. The only allowed file extension is *.txt. Notes will never appear on the audience screen. They are purely for the taskmaster's assistant, e.g. to read out times, quotes or anything else you want.
 
 ## Mac and Linux support
-As of now, the official releases contain only a Windows version. However as this project relies heavily on Python, it is not a big problem to run it also on Mac or Linux. You do need basic Python skills, though.
+As of now, the official releases contain only a Windows version. However as this project relies heavily on Python, it is not a big problem to run it also on Mac or Linux. You do need basic Python skills, though. Please do note that due to an absolute lack of Mac knowledge, a Mac release depends strongly on support from the outside. Maybe you can help?
 
 In order to install the necessary packages, browse to sources/app and install the project via
 
