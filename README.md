@@ -100,3 +100,7 @@ to start the application.
 > Q: I have an idea for a cool new feature, how can I let you know?
 > 
 > A: Just like for bugs, please register the idea here and describe it as precisely as possible: https://github.com/LocoMH/TaskmasterSuite/issues/new. Thanks!
+
+> Q: The websites don't seem to be loading properly.
+> 
+> A: Please note that due to external dependencies you will need an internet connection at least upon opening the websites. Later on it may be cached, I haven't tried that particular case.
