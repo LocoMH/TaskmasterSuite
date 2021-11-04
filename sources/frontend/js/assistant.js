@@ -23,7 +23,11 @@ new Vue({
             websocket: null,
             websocketConnected: false,
             ranks: {},
-            tm: null
+            scrollOptions: {
+                duration: 200,
+                offset: 0,
+                easing: 'easeInOutCubic'
+            }
         }
     },
     filters: {
@@ -229,6 +233,11 @@ new Vue({
         }
     },
     computed: {
+        target () {
+            const value = this['element']
+            if (!isNaN(value)) return Number(value)
+            else return value
+        },
         filteredGeneralFiles() {
             return this.general_files.filter(file => file.name.toLowerCase() != "taskmaster")
         },

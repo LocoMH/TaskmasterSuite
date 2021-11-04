@@ -16,10 +16,11 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-scrollto"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
     <div id="app">
-        <v-app dark>
-                <v-app-bar app style="font-family: 'veteran_typewriterregular', sans-serif; font-size: 150%;">
+        <v-app dark style="font-family: 'veteran_typewriterregular', sans-serif; font-size: 150%;">
+                <v-app-bar app style="font-family: 'veteran_typewriterregular', sans-serif;">
                     <v-avatar
                         size="30"
                         :color="websocketConnected ? 'success' : 'error'"
@@ -41,15 +42,33 @@
                         <template v-slot:label>
                             <v-icon>mdi-moon-waxing-crescent</v-icon>
                         </template>
-                    </v-switch>
+                    </v-switch>        
+                    <!-- <template v-slot:extension>
+                            <v-tabs
+                                centered
+                            >
+                                <v-tab @click="$vuetify.goTo($refs.basiccontrols, scrollOptions)">
+                                    Basic controls
+                                </v-tab>
+                                <v-tab @click="$vuetify.goTo($refs.generalfiles, scrollOptions)">
+                                    General files
+                                </v-tab>
+                                <v-tab @click="$vuetify.goTo($refs.scores, scrollOptions)">
+                                    Scores
+                                </v-tab>
+                                <v-tab @click="$vuetify.goTo($refs.taskfiles, scrollOptions)">
+                                    Task files
+                                </v-tab>
+                            </v-tabs>
+                    </template> -->
                 </v-app-bar>
                 <v-main>
                     <!-- <v-btn color="success" @click="loadContestants">Reload Contestants</v-btn>
                     <v-btn color="success" @click="loadTasks">Reload Tasks</v-btn>
                     <v-btn color="success" @click="loadScores">Reload Scores</v-btn>
                     <v-btn color="success" @click="loadGeneralFiles">Reload General Files</v-btn> -->
-                    <v-container fluid>
-                        <h3>
+                    <v-container fluid ref="basiccontrols">
+                        <h3 class="font-weight-regular">
                             Basic controls
                         </h3>
                         <v-btn class="ma-1" color="primary" @click="sendMessage('showTaskmaster')">Show Taskmaster</v-btn>
@@ -58,8 +77,8 @@
                         <v-btn class="ma-1" color="primary" @click="sendMessage('stopSound')">Stop all sounds</v-btn>
                     </v-container>
                     <v-divider></v-divider>
-                    <v-container fluid>
-                        <h3>
+                    <v-container fluid ref="generalfiles">
+                        <h3 class="font-weight-regular">
                             General files
                         </h3>
                         <v-layout row wrap class="mt-1">
@@ -135,18 +154,30 @@
                                         Play Video
                                         <v-icon right>mdi-video-vintage</v-icon>
                                     </v-btn>
-                                    <v-btn 
-                                        v-if="file.file_type == 'sound'"
-                                        color="primary"
-                                        width="140"
-                                        height="79"
-                                        large
-                                        block 
-                                        @click="sendMessage('playSound+++./data/' + file.file_source)"
-                                    >
-                                        Play Sound
-                                        <v-icon right>mdi-music</v-icon>
-                                    </v-btn>
+                                    <div v-if="file.file_type == 'sound'">
+                                        <v-btn 
+                                            color="primary"
+                                            width="140"
+                                            height="39"
+                                            large
+                                            block 
+                                            @click="sendMessage('playSound+++./data/' + file.file_source)"
+                                        >
+                                            Play Sound
+                                            <v-icon right>mdi-music</v-icon>
+                                        </v-btn>
+                                        <v-btn 
+                                            color="primary"
+                                            width="140"
+                                            height="39"
+                                            large
+                                            block 
+                                            @click="sendMessage('loopSound+++./data/' + file.file_source)"
+                                        >
+                                            Loop Sound
+                                            <v-icon right>mdi-refresh</v-icon>
+                                        </v-btn>
+                                    </div>
                                 </v-card>
                                 <v-card-actions style="max-height: 50px; min-height: 50px; height: 50px;">
                                     <v-spacer></v-spacer>
@@ -157,10 +188,10 @@
                         </v-layout>
                     </v-container>
                     <v-divider></v-divider>
-                    <v-container fluid>
+                    <v-container fluid ref="scores">
                         <v-layout row class="ma-1">
 
-                            <h3>
+                            <h3 class="font-weight-regular">
                                 Scores
                             </h3>
                             <v-spacer></v-spacer>
@@ -224,7 +255,7 @@
                                             <v-chip
                                                 left
                                                 class="pa-2"
-                                                color="primary"
+                                                color="rgb(150, 47, 43)"
                                                 small
                                             >
                                                 {{ totalScores[item.id] }}
@@ -325,8 +356,8 @@
                         </v-simple-table>
                     </v-container>
                     <v-divider></v-divider>
-                    <v-container fluid>
-                        <h3>
+                    <v-container fluid ref="taskfiles">
+                        <h3 class="font-weight-regular">
                             Task files for: {{ selectedTask.name }}
                         </h3>
                         <v-layout row wrap class="mt-1">

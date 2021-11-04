@@ -240,7 +240,15 @@
         }
         audio = new Audio(file)
         audio.play()
-        console.log(audio)
+    }
+
+    function loopSound(file) {
+        if (audio) {
+            audio.pause()
+        }
+        audio = new Audio(file)
+        audio.loop = true
+        audio.play()
     }
 
     var ws = new ReconnectingWebSocket("ws://" + window.location.host + "/ws")
@@ -295,6 +303,8 @@
             window.location.reload(true)
         } else if (action == "playSound") {
             playSound(content[1])
+        } else if (action == "loopSound") {
+            loopSound(content[1])
         } else if (action == "stopSound") {
             if (audio) {
                 audio.pause()
