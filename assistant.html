@@ -46,6 +46,7 @@
                     <!-- <template v-slot:extension>
                             <v-tabs
                                 centered
+                                grow
                             >
                                 <v-tab @click="$vuetify.goTo($refs.basiccontrols, scrollOptions)">
                                     Basic controls
@@ -58,6 +59,9 @@
                                 </v-tab>
                                 <v-tab @click="$vuetify.goTo($refs.taskfiles, scrollOptions)">
                                     Task files
+                                </v-tab>
+                                <v-tab @click="$vuetify.goTo($refs.notes, scrollOptions)">
+                                    Notes
                                 </v-tab>
                             </v-tabs>
                     </template> -->
@@ -505,6 +509,21 @@
                                 </v-card-actions>
                             </v-card> -->
                         </v-layout>
+                    </v-container>
+                    <v-divider></v-divider>
+                    <v-container fluid ref="notes">
+                        <v-row>
+                            <v-col>
+                                <h3 class="font-weight-regular">
+                                    Notes
+                                </h3>
+                            </v-col>
+                            <v-spacer></v-spacer>
+                            <v-col>
+                                <v-slider v-model="textareaSlider" min="0" max="100" label="Note size"></v-slider>
+                            </v-col>
+                        </v-row>
+                        <v-textarea solo label="Enter your notes here" v-model="note" @change="updateNote" :height="textareaSlider * 4"></v-textarea>
                     </v-container>
             </v-main>
         </v-app>

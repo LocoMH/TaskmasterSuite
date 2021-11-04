@@ -11,6 +11,8 @@ from tm_suite import db
 import easygui
 import ujson
 import asyncio
+from pydantic import BaseModel
+
 
 app = FastAPI()
 
@@ -54,6 +56,21 @@ async def get_tasks():
 @app.get("/data/general_files")
 async def get_general_files():
     return await db.get_general_files()
+
+
+@app.get("/data/note")
+async def get_note():
+    return await db.get_note()
+
+
+class Note(BaseModel):
+    text: str
+
+
+@app.post("/data/note")
+async def set_note(note: Note):
+    await db.update_note(note.text)
+    return Response(status_code=200)
 
 
 @app.get("/data/scores")

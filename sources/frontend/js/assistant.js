@@ -27,7 +27,9 @@ new Vue({
                 duration: 200,
                 offset: 0,
                 easing: 'easeInOutCubic'
-            }
+            },
+            note: "",
+            textareaSlider: 50
         }
     },
     filters: {
@@ -165,6 +167,22 @@ new Vue({
             .catch(e => {})
             .then(() => {})
         },
+        loadNote() {
+            axios.get("/data/note")
+            .then(response => {
+                this.note = response.data.text
+            })
+            .catch(e => {})
+            .then(() => {})
+        },
+        updateNote() {
+            axios.post("/data/note", {
+                text: this.note
+            })
+            .then(() => {})
+            .catch(e => {})
+            .then(() => {})
+        },
         connectToWebsocket() {
             this.websocket = new ReconnectingWebSocket("ws://" + location.hostname + ":8001/ws")
 
@@ -216,6 +234,7 @@ new Vue({
         this.loadContestants()
         this.loadGeneralFiles()
         this.loadScores()
+        this.loadNote()
         this.connectToWebsocket()
     },
     watch: {

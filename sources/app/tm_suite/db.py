@@ -6,6 +6,10 @@ contestants = TinyDB(helper.find_root() + "/sources/db/contestants.json")
 tasks = TinyDB(helper.find_root() + "/sources/db/tasks.json")
 scores = TinyDB(helper.find_root() + "/sources/db/scores.json")
 general_files = TinyDB(helper.find_root() + "/sources/db/general_files.json")
+note = TinyDB(helper.find_root() + "/sources/db/note.json")
+
+if len(note) == 0:
+    note.insert({"text": ""})
 
 
 async def add_general_file(name: str, file_source: str, file_type: str, text: str):
@@ -24,6 +28,16 @@ async def add_general_file(name: str, file_source: str, file_type: str, text: st
 
 async def remove_general_file(name: str):
     general_files.remove(Query().name == name)
+
+
+async def update_note(text: str):
+    note.update({
+        "text": text
+    })
+
+
+async def get_note():
+    return note.all()[0]
 
 
 async def get_scores():
