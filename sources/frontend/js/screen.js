@@ -244,6 +244,18 @@
     }
 
     var ws = new ReconnectingWebSocket("ws://" + window.location.host + "/ws")
+    
+
+    ws.onclose = function() {
+        console.log('websocket disconnected')
+        document.querySelector("#div-no-connection").style.display = "block"
+    }
+    
+    ws.onopen = function() {
+        console.log('websocket connected')
+        document.querySelector("#div-no-connection").style.display = "none"
+    }
+
     ws.onmessage = function(event) {
         console.log("received msg '" + event.data + "'")
         var content = event.data.split("+++")
