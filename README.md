@@ -18,18 +18,29 @@ Note that this application was tested on Windows 10 and an up-to-date version of
 ![Assistant screen](sources/readme/assistant_screen.png)
 
 1. This is either a red cross or a green check mark, letting you know whether the website is connected to the server which you are running (`server.exe`).
-2. Top right corner: Change between light and dark mode here.
-3. Section `Basic controls`: As of now, there are four buttons here (points 4.-8.).
-4. Show taskmaster: Will show the taskmaster image on the audience screen (the one which is shown when you open the audience screen the first time).
-5. Show scoreboard: Will show the scoreboard with all contestants and their current scores.
-6. Update scoreboard: Having distributed the scores, the assistant can click this button and the contestants get their scores updated on the audience screen and switch places.
-7. Stop all sounds: In case any sound is playing, it is stopped using this button.
-8. Section `General files`: Any files which you have placed into the `data` directory. More information on how to set the files can be found below in the section [`Alter files`](#alter-files).
-9. Section `Scores`: Table with tasks and contestants and the respective scores.
-10. Reset all scores: Will set all scores to 0 after reconfirmation.
-11. All tasks are listed in the table vertically. Clicking on them will open the task in the section `Task files for: <Task name>` (see point 13).
-12. All contestants are listed in the table horizontally. You can also see the total score (sum of all task scores) for each contestant.
-13. Section `Task files for: <Task name>`: Any files which are related to a specific task. Choose the task by clicking on the button in the table above. More information on how to set the files can be found below in the section [`Alter files`](#alter-files).
+2. Change between light and dark mode here.
+3. Quick navigation buttons help you to get to the section you need quickly.
+4. Section `Basic controls`: As of now, there are four buttons here (points 5.-8.).
+5. Show taskmaster: Will show the taskmaster image on the audience screen (the one which is shown when you open the audience screen the first time).
+6. Show scoreboard: Will show the scoreboard with all contestants and their current scores.
+7. Update scoreboard: Having distributed the scores, the assistant can click this button and the contestants get their scores updated on the audience screen and switch places.
+8. Stop all sounds: In case any sound is playing, it is stopped using this button.
+9. Section `General files`: Any files which you have placed into the `data` directory. More information on how to set the files can be found below in the section [`Alter files`](#alter-files).
+10. An example for an image file. Click on the image to show it on the audience screen.
+11. An example for a note file. Click on it to see the note on the assistant screen.
+12. An example for a sound file. Click on Play Sound to play the sound once.
+13. Click on Loop Sound to play the sound in a loop.
+14. Section `Scores`: Table with tasks and contestants and the respective scores.
+15. Reset all scores: Will set all scores to 0 after reconfirmation.
+16. All tasks are listed in the table vertically.
+17. All contestants are listed in the table horizontally. You can also see the total score (sum of all task scores) for each contestant.
+18. Clicking on a task will open it in the section `Task files for: <Task name>` (see point 20).
+19. Scores can be given in two ways: Either directly via the text field or by clicking on the "123" button and using the quick buttons for scores 0 to 6.
+20. Section `Task files for: <Task name>`: Any files which are related to a specific task. Choose the task by clicking on the button in the table above. More information on how to set the files can be found below in the section [`Alter files`](#alter-files).
+21. An example for a video file. Click on it to play the video on the audience screen.
+22. Section `Notes`: One text area which you can fill according to your needs.
+23. Slider to change the size of the note text area.
+24. Note text area.
 
 ## Alter files
 You can change almost anything to make the application show the images and videos that you want. The only time you ever need to reload the audience website is after you've changed any of the following:
