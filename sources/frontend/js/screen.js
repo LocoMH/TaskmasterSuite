@@ -290,7 +290,7 @@
 			}
 
 			document.getElementById('video').addEventListener('ended', function (e) {
-				showDiv("taskmaster")
+				showDiv("scoreboard")
 			}, false)
 
 			document.getElementById('video').addEventListener('playing', function (e) {
