@@ -3,7 +3,7 @@
  * I wasn't configuring babel/webpack for a one off fun project.
  */
 
-(function() {
+(function () {
 	var contestantsList = []
 
 	// var main = document.querySelector("#div-scoreboard")
@@ -14,7 +14,7 @@
 		contestant.image = imagePath
 		contestant.score = score
 		contestant.oldScore = score
-        contestant.id = id
+		contestant.id = id
 
 		contestantsList.push(contestant)
 
@@ -67,7 +67,7 @@
 
 		scoreContainer.appendChild(seal)
 		scoreContainer.appendChild(score)
-		
+
 		el.appendChild(frameScaler)
 		el.appendChild(scoreContainer)
 
@@ -76,15 +76,15 @@
 
 	function transformContestants() {
 
-		contestantsList = contestantsList.sort(function(first, second) {
-            return first.score - second.score
+		contestantsList = contestantsList.sort(function (first, second) {
+			return first.score - second.score
 		})
 
 		var maxScore = contestantsList[contestantsList.length - 1].score
 		var maxCount = 1
 
 		for (var i = contestantsList.length - 1; i > 0; --i) {
-			var con = contestantsList[i-1]
+			var con = contestantsList[i - 1]
 			if (con.score == maxScore) {
 				++maxCount
 			}
@@ -112,25 +112,25 @@
 	}
 
 	function refreshContestants() {
-        var innerScoreboard = document.querySelector("#inner-scoreboard")
-        
-        innerScoreboard.innerHTML = ""
+		var innerScoreboard = document.querySelector("#inner-scoreboard")
+
+		innerScoreboard.innerHTML = ""
 
 		for (var i = contestantsList.length; i > 0; --i) {
-			var con = contestantsList[i-1]
+			var con = contestantsList[i - 1]
 
 			var cEl = createContestantEl(con, i)
 			con.el = cEl
 		}
 
 		if (contestantsList.length > 0) transformContestants();
-		
+
 		for (var i = contestantsList.length; i > 0; --i) {
-			var con = contestantsList[i-1]
+			var con = contestantsList[i - 1]
 			innerScoreboard.appendChild(con.el)
 		}
 
-        innerScoreboard.style.width = 275 * contestantsList.length + "px"
+		innerScoreboard.style.width = 275 * contestantsList.length + "px"
 
 	}
 
@@ -141,32 +141,32 @@
 
 	function play() {
 
-		setTimeout(function() {
+		setTimeout(function () {
 			var start = 0;
-			var loop = function(dt) {
+			var loop = function (dt) {
 				if (start == 0) {
 					start = dt
 				}
-	
+
 				for (var i = 0, l = contestantsList.length; i < l; ++i) {
 					var con = contestantsList[i]
-	
+
 					var startRemainder = con.oldScore - Math.floor(con.oldScore)
 					var endRemainder = con.score - Math.floor(con.score)
-	
+
 					var scoreEl = con.el.querySelector(".score")
-	
+
 					var score = Math.round(ease(Math.min((dt - start) / 2000, 1), Math.floor(con.oldScore), Math.floor(con.score)))
-	
+
 					if (dt - start < 1000) {
 						score += startRemainder
 					} else {
 						score += endRemainder
 					}
-	
+
 					scoreEl.innerText = (score.toFixed(3) * 1)
 				}
-	
+
 				if (dt - start < 2000) {
 					window.requestAnimationFrame(loop)
 				} else {
@@ -176,158 +176,158 @@
 					}
 				}
 			};
-	
+
 			window.requestAnimationFrame(loop)
 			transformContestants()
 		}, 10)
 	}
 
-    var contestants = []
+	var contestants = []
 
-    function getContestants() {
-        var xhttp = new XMLHttpRequest()
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                contestants = JSON.parse(this.responseText)
-                contestants.sort((a, b) => a.name.localeCompare(b.name))
-                contestants.sort((a, b) => b["total_score"] - a["total_score"])
-                contestants.forEach(contestant => {
-                    addContestant("./data/contestants/" + contestant["file_source"], contestant["id"], contestant["total_score"])
-                })
-            
-                refreshContestants()
-            }
-        }
-        xhttp.open("GET", "/data/contestants_with_total_score", false)
-        xhttp.send()
-    }
+	function getContestants() {
+		var xhttp = new XMLHttpRequest()
+		xhttp.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				contestants = JSON.parse(this.responseText)
+				contestants.sort((a, b) => a.name.localeCompare(b.name))
+				contestants.sort((a, b) => b["total_score"] - a["total_score"])
+				contestants.forEach(contestant => {
+					addContestant("./data/contestants/" + contestant["file_source"], contestant["id"], contestant["total_score"])
+				})
 
-    function getGeneralFiles() {
-        var xhttp = new XMLHttpRequest()
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                general_files = JSON.parse(this.responseText)
-            }
-        }
-        xhttp.open("GET", "/data/general_files", false)
-        xhttp.send()
-    }
-    
-    getContestants()
-    getGeneralFiles()
+				refreshContestants()
+			}
+		}
+		xhttp.open("GET", "/data/contestants_with_total_score", false)
+		xhttp.send()
+	}
 
-    document.querySelector("#image-taskmaster").src = "./data/" + general_files.find(file => {
-        return file.name.toLowerCase() == "taskmaster"
-    }).file_source
+	function getGeneralFiles() {
+		var xhttp = new XMLHttpRequest()
+		xhttp.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				general_files = JSON.parse(this.responseText)
+			}
+		}
+		xhttp.open("GET", "/data/general_files", false)
+		xhttp.send()
+	}
 
-    function showDiv(name) {
-        document.querySelector("#div-" + name).style.display = "block"
-        document.querySelectorAll(".div-containers").forEach(cont => {
-            if (!cont.id.includes(name) && !cont.id.includes("taskmaster")) {
-                cont.style.display = "none"
-            }
-        })
-        if (name != "video") {
-            document.querySelector("#video").pause()
-        }
-    }
+	getContestants()
+	getGeneralFiles()
 
-    var audio = null
+	document.querySelector("#image-taskmaster").src = "./data/" + general_files.find(file => {
+		return file.name.toLowerCase() == "taskmaster"
+	}).file_source
 
-    function playSound(file) {
-        if (audio) {
-            audio.pause()
-        }
-        audio = new Audio(file)
-        audio.play()
-    }
+	function showDiv(name) {
+		document.querySelector("#div-" + name).style.display = "block"
+		document.querySelectorAll(".div-containers").forEach(cont => {
+			if (!cont.id.includes(name) && !cont.id.includes("taskmaster")) {
+				cont.style.display = "none"
+			}
+		})
+		if (name != "video") {
+			document.querySelector("#video").pause()
+		}
+	}
 
-    function loopSound(file) {
-        if (audio) {
-            audio.pause()
-        }
-        audio = new Audio(file)
-        audio.loop = true
-        audio.play()
-    }
+	var audio = null
 
-    var ws = new ReconnectingWebSocket("ws://" + window.location.host + "/ws")
-    
+	function playSound(file) {
+		if (audio) {
+			audio.pause()
+		}
+		audio = new Audio(file)
+		audio.play()
+	}
 
-    ws.onclose = function() {
-        console.log('websocket disconnected')
-        document.querySelector("#div-no-connection").style.display = "block"
-    }
-    
-    ws.onopen = function() {
-        console.log('websocket connected')
-        document.querySelector("#div-no-connection").style.display = "none"
-    }
+	function loopSound(file) {
+		if (audio) {
+			audio.pause()
+		}
+		audio = new Audio(file)
+		audio.loop = true
+		audio.play()
+	}
 
-    ws.onmessage = function(event) {
-        console.log("received msg '" + event.data + "'")
-        var content = event.data.split("+++")
-        var action = content[0]
-        if (action == "play") {
-            play()
-        } else if (action == "setScore") {
-            contestantsList.find(c => c.id == content[2]).score = content[4]
-        } else if (action == "showImage") {
-            document.querySelector("#image").src = content[1]
-            showDiv("image")
-        } else if (action == "showScoreboard") {
-            showDiv("scoreboard")
-        } else if (action == "showVideo") {
+	var ws = new ReconnectingWebSocket("ws://" + window.location.host + "/ws")
 
-            document.querySelector("#video-src").setAttribute('src', content[1])
 
-            document.querySelector("#video").load()
-            document.querySelector("#video").currentTime = 0
-            document.querySelector("#video").play()
+	ws.onclose = function () {
+		console.log('websocket disconnected')
+		document.querySelector("#div-no-connection").style.display = "block"
+	}
 
-            if (audio) {
-                audio.pause()
-            }
+	ws.onopen = function () {
+		console.log('websocket connected')
+		document.querySelector("#div-no-connection").style.display = "none"
+	}
 
-            document.getElementById('video').addEventListener('ended', function(e) {
-                showDiv("taskmaster")
-            }, false)
+	ws.onmessage = function (event) {
+		console.log("received msg '" + event.data + "'")
+		var content = event.data.split("+++")
+		var action = content[0]
+		if (action == "play") {
+			play()
+		} else if (action == "setScore") {
+			contestantsList.find(c => c.id == content[2]).score = content[4]
+		} else if (action == "showImage") {
+			document.querySelector("#image").src = content[1]
+			showDiv("image")
+		} else if (action == "showScoreboard") {
+			showDiv("scoreboard")
+		} else if (action == "showVideo") {
 
-            document.getElementById('video').addEventListener('playing', function(e) {
-                showDiv("video")
-            }, false)
-            
-        } else if (action == "showTaskmaster") {
-            showDiv("taskmaster")
-        } else if (action == "resetScores") {
-            window.location.reload(true)
-        } else if (action == "playSound") {
-            playSound(content[1])
-        } else if (action == "loopSound") {
-            loopSound(content[1])
-        } else if (action == "stopSound") {
-            if (audio) {
-                audio.pause()
-            }
-        }
-    }
+			document.querySelector("#video-src").setAttribute('src', content[1])
 
-    function resize() {
-        var divScoreboard2 = document.querySelector("#div-scoreboard-2")
-        var divTaskmaster = document.querySelector("#inner-taskmaster")
+			document.querySelector("#video").load()
+			document.querySelector("#video").currentTime = 0
+			document.querySelector("#video").play()
+
+			if (audio) {
+				audio.pause()
+			}
+
+			document.getElementById('video').addEventListener('ended', function (e) {
+				showDiv("taskmaster")
+			}, false)
+
+			document.getElementById('video').addEventListener('playing', function (e) {
+				showDiv("video")
+			}, false)
+
+		} else if (action == "showTaskmaster") {
+			showDiv("taskmaster")
+		} else if (action == "resetScores") {
+			window.location.reload(true)
+		} else if (action == "playSound") {
+			playSound(content[1])
+		} else if (action == "loopSound") {
+			loopSound(content[1])
+		} else if (action == "stopSound") {
+			if (audio) {
+				audio.pause()
+			}
+		}
+	}
+
+	function resize() {
+		var divScoreboard2 = document.querySelector("#div-scoreboard-2")
+		var divTaskmaster = document.querySelector("#inner-taskmaster")
 		var w = window.innerWidth
 		var h = window.innerHeight
 
 		var wm = 1400 * ((contestants.length + (0.25)) / 5)
 
 		var m = Math.min(w / wm, h / 1080)
-        var m2 = h / 1080 * 1.25
+		var m2 = h / 1080 * 1.25
 
 		divScoreboard2.style.msTransform = "scale(" + m + ")"
 		divScoreboard2.style.transform = "scale(" + m + ")"
 
-        divTaskmaster.style.transform = "scale(" + m2 + ")"
-        divTaskmaster.style.msTransform = "scale(" + m2 + ")"
+		divTaskmaster.style.transform = "scale(" + m2 + ")"
+		divTaskmaster.style.msTransform = "scale(" + m2 + ")"
 	}
 
 	window.addEventListener("resize", resize)
