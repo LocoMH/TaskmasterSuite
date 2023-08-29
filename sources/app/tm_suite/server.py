@@ -1,18 +1,20 @@
+import asyncio
+import multiprocessing
 import threading
 from typing import List
-from fastapi import FastAPI, WebSocket, Response
-from fastapi.staticfiles import StaticFiles
-from starlette.websockets import WebSocketDisconnect
-import uvicorn
-import multiprocessing
-from tm_suite.loader import generate_files
-from tm_suite import helper
-from tm_suite import db
+
 import easygui
 import ujson
-import asyncio
+import uvicorn
+from fastapi import FastAPI
+from fastapi import Response
+from fastapi import WebSocket
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-
+from starlette.websockets import WebSocketDisconnect
+from tm_suite import db
+from tm_suite import helper
+from tm_suite.loader import generate_files
 
 app = FastAPI()
 
@@ -110,8 +112,14 @@ async def start_file_generation():
 
 
 def show_window():
-    easygui.msgbox("The Taskmaster Suite was succesfully launched!\n\nTo use the application, open a browser.\n\nFor the audience screen, open this website:\n\nhttp://" + helper.get_ip() + ":8001/home/screen.html\n\nFor the assistant screen, open this website:\n\nhttp://" + helper.get_ip() +
-                   ":8001/home/assistant.html\n\nYou can open the websites on any device (including Android/iOS) in your private WiFi network in order to use the application.\n\nNote that closing this window does not stop the application. Closing the black command prompt window does.", "Successfully started")
+    easygui.msgbox(
+        "The Taskmaster Suite was succesfully launched!\n\nTo use the application, open a browser.\n\nFor the audience screen, open this website:\n\nhttp://"
+        + helper.get_ip()
+        + ":8001/home/screen.html\n\nFor the assistant screen, open this website:\n\nhttp://"
+        + helper.get_ip()
+        + ":8001/home/assistant.html\n\nYou can open the websites on any device (including Android/iOS) in your private WiFi network in order to use the application.\n\nNote that closing this window does not stop the application. Closing the black command prompt window does.",
+        "Successfully started",
+    )
 
 
 @app.on_event("startup")
@@ -126,7 +134,7 @@ async def startup_event():
 
 def start_server():
     multiprocessing.freeze_support()
-    uvicorn.run(app, host="0.0.0.0", port=8001, loop='asyncio')
+    uvicorn.run(app, host="0.0.0.0", port=8001, loop="asyncio")
 
 
 if __name__ == "__main__":
